@@ -7,7 +7,7 @@ import { HttpResponse } from '@/types/response';
 if (import.meta.env.VITE_API_BASE_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 }
-
+axios.defaults.validateStatus = () => true;
 axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // let each request carry token
@@ -52,13 +52,13 @@ axios.interceptors.response.use(
           },
         });
       }
-      return Promise.reject(new Error(res?.error || 'Error'));
+      return Promise.reject(new Error(res.error || res.message || 'Error'));
     }
     return res;
   },
   (error) => {
     Message.error({
-      content: error.msg || 'Request Error',
+      content: error.message || 'Request Error',
       duration: 5 * 1000,
     });
     return Promise.reject(error);

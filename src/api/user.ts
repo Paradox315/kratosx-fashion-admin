@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { UserState } from '@/store/modules/user/types';
 import { HttpResponse } from '@/types/response';
 import {
   IDReply,
@@ -9,11 +8,15 @@ import {
   UserReply,
   UserRequest,
 } from '@/types/user';
+import { UserState } from '@/store/modules/user/types';
 
 const prefix = '/api/system/v1/user';
 
 export function getUserInfo(id: string) {
   return axios.get<UserReply, HttpResponse<UserReply>>(`${prefix}/${id}`);
+}
+export function initUserInfo() {
+  return axios.get<UserState, HttpResponse<UserState>>(`${prefix}/init/info`);
 }
 
 export function getUserList(params: ListSearchRequest) {

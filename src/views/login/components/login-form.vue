@@ -12,7 +12,7 @@
     >
       <a-form-item
         field="username"
-        :rules="[{ required: true, message: $t('login.form.userName.errMsg') }]"
+        :rules="[{ required: true, message: $t('login.form.username.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
       >
@@ -49,12 +49,12 @@
       >
         <div class="pic-box">
           <a-input
-            v-model="captcha.value"
+            v-model="userInfo.captcha"
             style="width: 60%"
             :placeholder="$t('login.form.captcha.placeholder')"
           >
             <template #prefix>
-              <icon-lock />
+              <icon-safe />
             </template>
           </a-input>
           <div class="pic">
@@ -68,20 +68,121 @@
         </div>
       </a-form-item>
       <a-space :size="16" direction="vertical">
-        <div class="login-form-password-actions">
-          <a-checkbox checked="rememberPassword" @change="setRememberPassword">
-            {{ $t('login.form.rememberPassword') }}
-          </a-checkbox>
-          <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
-        </div>
         <a-button type="primary" html-type="submit" long :loading="loading">
           {{ $t('login.form.login') }}
         </a-button>
-        <a-button type="text" long class="login-form-register-btn">
+        <a-button
+          type="text"
+          long
+          class="login-form-register-btn"
+          @click="handleClick"
+        >
           {{ $t('login.form.register') }}
         </a-button>
       </a-space>
     </a-form>
+    <a-modal
+      v-model:visible="visible"
+      :title="$t('login.form.register')"
+      :footer="false"
+      unmount-on-close
+      @cancel="handleCancel"
+    >
+      <a-form :model="registerInfo" @submit="handleRegisterSubmit">
+        <a-form-item
+          field="username"
+          :label="$t('login.form.register.username')"
+          :rules="[
+            { required: true, message: $t('login.form.username.errMsg') },
+            {
+              match: usernamePattern,
+              message: $t('login.form.username.errMsg'),
+            },
+          ]"
+          :extra="$t('login.form.register.username.extra')"
+          :validate-trigger="['change', 'blur']"
+        >
+          <a-input v-model="registerInfo.username">
+            <template #prefix>
+              <icon-user />
+            </template>
+          </a-input>
+        </a-form-item>
+        <a-form-item
+          field="password"
+          :label="$t('login.form.register.password')"
+          :rules="[
+            { required: true, message: $t('login.form.password.errMsg') },
+            { minLength: 6, message: $t('login.form.password.errMsg') },
+          ]"
+          :extra="$t('login.form.register.password.extra')"
+          :validate-trigger="['change', 'blur']"
+        >
+          <a-input-password v-model="registerInfo.password" allow-clear>
+            <template #prefix>
+              <icon-lock />
+            </template>
+          </a-input-password>
+        </a-form-item>
+        <a-form-item
+          field="email"
+          :label="$t('login.form.register.email')"
+          :rules="[
+            { match: emailPattern, message: $t('login.form.email.errMsg') },
+          ]"
+        >
+          <a-input v-model="registerInfo.email">
+            <template #prefix>
+              <icon-email />
+            </template>
+          </a-input>
+        </a-form-item>
+        <a-form-item
+          field="mobile"
+          :label="$t('login.form.register.mobile')"
+          :rules="[
+            { match: mobilePattern, message: $t('login.form.mobile.errMsg') },
+          ]"
+        >
+          <a-input v-model="registerInfo.mobile">
+            <template #prefix>
+              <icon-phone />
+            </template>
+          </a-input>
+        </a-form-item>
+        <a-form-item
+          field="captcha"
+          :label="$t('login.form.register.captcha')"
+          :rules="[
+            { required: true, message: $t('login.form.captcha.errMsg') },
+          ]"
+          :validate-trigger="['change', 'blur']"
+        >
+          <div class="pic-box">
+            <a-input
+              v-model="registerInfo.captcha"
+              style="width: 60%"
+              :placeholder="$t('login.form.captcha.placeholder')"
+            >
+              <template #prefix>
+                <icon-safe />
+              </template>
+            </a-input>
+            <div class="pic">
+              <img
+                v-if="captcha.src"
+                :src="captcha.src"
+                :alt="$t('login.form.captcha.alt')"
+                @click="captcha.refresh"
+              />
+            </div>
+          </div>
+        </a-form-item>
+        <a-button type="primary" html-type="submit" :loading="loading">
+          提交
+        </a-button>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -93,35 +194,63 @@
   import { useI18n } from 'vue-i18n';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
-  import { getCaptcha } from '@/api/public';
+  import { getCaptcha, userRegister } from '@/api/public';
+  import { LoginRequest, RegisterRequest } from '@/types/public';
 
+  const emailPattern = new RegExp(
+    '^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$'
+  );
+  const mobilePattern = new RegExp('^1([3456789])\\d{9}$');
+  const usernamePattern = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{4,15}$');
   const router = useRouter();
   const { t } = useI18n();
   const errorMessage = ref('');
   const { loading, setLoading } = useLoading();
   const userStore = useUserStore();
 
+  const visible = ref(false);
+  const handleClick = () => {
+    visible.value = true;
+  };
+  const handleCancel = () => {
+    visible.value = false;
+  };
+
   const userInfo = reactive({
     username: 'admin',
-    password: 'admin',
+    password: '123456',
     captcha_id: '',
     captcha: '',
   });
+
+  const registerInfo = reactive({
+    username: '',
+    password: '',
+    mobile: '',
+    email: '',
+    captcha_id: '',
+    captcha: '',
+  });
+
   const captcha = reactive({
     src: '',
     refresh: async () => {
       const res = await getCaptcha();
       userInfo.captcha_id = res.metadata.captcha_id;
+      registerInfo.captcha_id = res.metadata.captcha_id;
       captcha.src = res.metadata.pic_path as string;
     },
   });
+
   captcha.refresh();
+
+  // 提交表单
   const handleSubmit = async ({
     errors,
     values,
   }: {
     errors: Record<string, ValidatedError> | undefined;
-    values: LoginData;
+    values: LoginRequest;
   }) => {
     if (!errors) {
       setLoading(true);
@@ -142,8 +271,26 @@
       }
     }
   };
-  const setRememberPassword = () => {
-    //
+
+  const handleRegisterSubmit = async ({
+    errors,
+    values,
+  }: {
+    errors: Record<string, ValidatedError> | undefined;
+    values: RegisterRequest;
+  }) => {
+    if (!errors) {
+      setLoading(true);
+      try {
+        await userRegister(values);
+        Message.success(t('login.form.register.success'));
+        visible.value = false;
+      } catch (err) {
+        errorMessage.value = (err as Error).message;
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 </script>
 
@@ -181,15 +328,18 @@
       color: var(--color-text-3) !important;
     }
   }
+
   .pic-box {
     display: flex;
     justify-content: space-between;
     width: 100%;
   }
+
   .pic {
     width: 33%;
     height: 38px;
     background: #ccc;
+
     img {
       width: 100%;
       height: 100%;

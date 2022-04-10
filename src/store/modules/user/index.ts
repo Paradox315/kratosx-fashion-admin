@@ -2,9 +2,8 @@ import { defineStore } from 'pinia';
 import { userLogin, userLogout } from '@/api/public';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
-import { getUserInfo } from '@/api/user';
+import { initUserInfo } from '@/api/user';
 import { LoginRequest } from '@/types/public';
-import { UserReply } from '@/types/user';
 import { UserState } from './types';
 
 const useUserStore = defineStore('user', {
@@ -20,7 +19,7 @@ const useUserStore = defineStore('user', {
     /** @format int64 */
     status: undefined,
     registerDate: undefined,
-    roles: Array<string>(),
+    roles: undefined,
   }),
 
   getters: {
@@ -37,19 +36,8 @@ const useUserStore = defineStore('user', {
       });
     },
     // Set user's information
-    setInfo(info: Partial<UserReply>) {
-      this.$patch((state) => {
-        state.id = info.id;
-        state.username = info.username;
-        state.avatar = info.avatar;
-        state.email = info.email;
-        state.mobile = info.mobile;
-        state.nickname = info.nickname;
-        state.nickname = info.nickname;
-        state.status = info.status;
-        state.registerDate = info.created_at;
-        state.roles = info.user_roles?.map((item) => item.id);
-      });
+    setInfo(info: Partial<UserState>) {
+      this.$patch(info);
     },
 
     // Reset user's information
@@ -59,8 +47,7 @@ const useUserStore = defineStore('user', {
 
     // Get user's information
     async info() {
-      const res = await getUserInfo('');
-
+      const res = await initUserInfo();
       this.setInfo(res.metadata);
     },
 

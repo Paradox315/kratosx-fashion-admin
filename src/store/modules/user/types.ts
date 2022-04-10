@@ -10,5 +10,5 @@ export interface UserState {
   /** @format int64 */
   status?: number;
   registerDate?: string;
-  roles: Array<string | undefined> | undefined;
+  roles?: string[];
 }
