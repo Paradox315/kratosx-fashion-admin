@@ -8,7 +8,6 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
   import {
-    queryCertification,
     UnitCertification,
     EnterpriseCertificationModel,
   } from '@/api/user-center';
@@ -23,8 +22,8 @@
   });
   const fetchData = async () => {
     try {
-      const { data: resData } = await queryCertification();
-      data.value = resData;
+      // const { data: resData } = await queryCertification();
+      // data.value = resData;
     } catch (err) {
       // you can report use errorHandler or other
     } finally {

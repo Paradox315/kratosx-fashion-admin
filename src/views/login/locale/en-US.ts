@@ -2,6 +2,8 @@ export default {
   'login.form.title': 'Login to Arco Design Pro',
   'login.form.username.errMsg': 'Username cannot be empty',
   'login.form.password.errMsg': 'Password cannot be empty',
+  'login.form.password.match.errMsg':
+    'Password cannot be less than 6 characters',
   'login.form.login.errMsg': 'Login error, refresh and try again',
   'login.form.captcha.errMsg': 'Captcha cannot be empty',
   'login.form.email.errMsg': 'Email is invalid',

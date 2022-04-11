@@ -127,15 +127,7 @@
           </a-avatar>
           <template #content>
             <a-doption>
-              <a-space @click="switchRoles">
-                <icon-tag />
-                <span>
-                  {{ $t('messageBox.switchRoles') }}
-                </span>
-              </a-space>
-            </a-doption>
-            <a-doption>
-              <a-space @click="$router.push({ name: 'info' })">
+              <a-space @click="$router.push({ name: 'Info' })">
                 <icon-user />
                 <span>
                   {{ $t('messageBox.userCenter') }}
@@ -143,7 +135,7 @@
               </a-space>
             </a-doption>
             <a-doption>
-              <a-space @click="$router.push({ name: 'setting' })">
+              <a-space @click="$router.push({ name: 'Setting' })">
                 <icon-settings />
                 <span>
                   {{ $t('messageBox.userSettings') }}

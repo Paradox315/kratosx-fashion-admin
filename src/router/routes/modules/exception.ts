@@ -16,7 +16,7 @@ export default {
       meta: {
         locale: 'menu.exception.403',
         requiresAuth: true,
-        roles: ['admin'],
+        roles: ['*'],
       },
     },
     {

@@ -6,6 +6,7 @@ import {
   LoginReply,
   RegisterRequest,
   RegisterReply,
+  UploadReply,
 } from '@/types/public';
 
 const prefix = '/api/system/v1/pub';
@@ -32,4 +33,17 @@ export function userLogin(data: LoginRequest) {
 
 export function userLogout() {
   return axios.post<void, HttpResponse<void>>(`${prefix}/logout`);
+}
+
+export function uploadFile(
+  data: FormData,
+  onUploadProgress?: (progressEvent: any) => void
+) {
+  return axios.post<UploadReply, HttpResponse<UploadReply>>(
+    `${prefix}/upload`,
+    data,
+    {
+      onUploadProgress,
+    }
+  );
 }

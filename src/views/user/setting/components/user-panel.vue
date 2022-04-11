@@ -51,42 +51,50 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { computed, reactive, ref } from 'vue';
   import {
     FileItem,
     RequestOption,
   } from '@arco-design/web-vue/es/upload/interfaces';
   import { useUserStore } from '@/store';
-  import { userUploadApi } from '@/api/user-center';
+  import { uploadFile } from '@/api/public';
 
   const userStore = useUserStore();
   const file = {
-    uid: '-2',
+    uid: '',
     name: 'avatar.png',
     url: userStore.avatar,
   };
-  const renderData = [
+  const renderData = reactive([
     {
       label: 'userSetting.label.name',
-      value: userStore.name,
-    },
-    {
-      label: 'userSetting.label.certification',
-      value: userStore.certification,
+      value: computed(() => userStore.nickname || userStore.username),
     },
     {
       label: 'userSetting.label.accountId',
-      value: userStore.accountId,
+      value: userStore.id,
     },
     {
       label: 'userSetting.label.phone',
-      value: userStore.phone,
+      value: computed(() => userStore.mobile),
+    },
+    {
+      label: 'userSetting.label.email',
+      value: computed(() => userStore.email),
+    },
+    {
+      label: 'userSetting.label.certification',
+      value: '',
     },
     {
       label: 'userSetting.label.registrationDate',
-      value: userStore.registrationDate,
+      value: userStore.registerDate,
     },
-  ];
+    {
+      label: 'userSetting.label.gender',
+      value: computed(() => userStore.gender),
+    },
+  ]);
   const fileList = ref<FileItem[]>([file]);
   const uploadChange = (fileItemList: FileItem[], fileItem: FileItem) => {
     fileList.value = [fileItem];
@@ -106,7 +114,8 @@
     try {
       // https://github.com/axios/axios/issues/1630
       // https://github.com/nuysoft/Mock/issues/127
-      const res = await userUploadApi(formData, onUploadProgress);
+      const res = await uploadFile(formData, onUploadProgress);
+      await userStore.update({ avatar: res.metadata.url });
       onSuccess(res);
     } catch (error) {
       onError(error);
@@ -119,11 +128,13 @@
     padding: 14px 0 4px 4px;
     border-radius: 4px;
   }
+
   :deep(.arco-avatar-trigger-icon-button) {
     width: 32px;
     height: 32px;
     line-height: 32px;
     background-color: #e8f3ff;
+
     .arco-icon-camera {
       margin-top: 8px;
       color: rgb(var(--arcoblue-6));

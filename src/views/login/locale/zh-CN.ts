@@ -2,6 +2,7 @@ export default {
   'login.form.title': '登录 Arco Design Pro',
   'login.form.username.errMsg': '用户名不能为空',
   'login.form.password.errMsg': '密码不能为空',
+  'login.form.password.match.errMsg': '密码长度不能小于6位',
   'login.form.captcha.errMsg': '验证码不能为空',
   'login.form.email.errMsg': '邮箱格式不正确',
   'login.form.mobile.errMsg': '手机号格式不正确',

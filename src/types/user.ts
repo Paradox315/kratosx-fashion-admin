@@ -52,6 +52,7 @@ export interface PasswordRequest {
   id?: string;
   old_password?: string;
   new_password?: string;
+  confirm_password?:string;
 }
 
 export interface QueryOption {
@@ -96,6 +97,7 @@ export interface UserRequest {
   avatar?: string;
   email?: string;
   mobile?: string;
+  nickname?: string;
 
   /** @format int64 */
   gender?: number;
@@ -115,4 +117,28 @@ export interface UserRoleID {
   id?: string;
   user_id?: string;
   role_id?: string;
+}
+
+export interface Position{
+  lat?: number;
+  lng?: number;
+}
+
+export interface LoginLogReply {
+  ip?: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  position?: Position;
+  time?: string;
+  agent?: string;
+  os?: string;
+  device?: string;
+  device_type?: number;
+  login_type?: number;
+}
+
+export interface ListLoginLogReply{
+  list?: LoginLogReply[];
+  total?: number;
 }

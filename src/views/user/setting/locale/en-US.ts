@@ -20,16 +20,28 @@ export default {
   // new
   'userSetting.label.certification': 'Certification',
   'userSetting.label.phone': 'Phone',
+  'userSetting.label.email': 'Email',
+  'userSetting.label.gender': 'Gender',
   'userSetting.label.accountId': 'Account Id',
   'userSetting.label.registrationDate': 'Registration Date',
   'userSetting.tab.basicInformation': 'Basic Information',
   'userSetting.tab.securitySettings': 'Security Settings',
   'userSetting.tab.certification': 'Certification',
   'userSetting.basicInfo.form.label.email': 'Email',
+  'userSetting.basicInfo.form.error.email':
+    'Please enter a valid email address',
+  'userSetting.basicInfo.form.label.mobile': 'Mobile Phone',
+  'userSetting.basicInfo.form.error.mobile':
+    'Please enter a valid mobile phone number',
   'userSetting.basicInfo.placeholder.email': `Please enter your email address, such as xxx{'@'}bytedance.com`,
+  'userSetting.basicInfo.placeholder.mobile': 'Please enter your mobile number',
   'userSetting.form.error.email.required': 'Please enter email address',
   'userSetting.basicInfo.form.label.nickname': 'Nickname',
   'userSetting.basicInfo.placeholder.nickname': 'Please enter nickname',
+  'userSetting.basicInfo.form.label.gender': 'gender',
+  'userSetting.basicInfo.form.label.unknown': 'unknown',
+  'userSetting.basicInfo.form.label.female': 'female',
+  'userSetting.basicInfo.form.label.male': 'male',
   'userSetting.form.error.nickname.required': 'Please enter nickname',
   'userSetting.basicInfo.form.label.countryRegion': 'Country/region',
   'userSetting.basicInfo.placeholder.countryRegion':
@@ -57,12 +69,28 @@ export default {
   'userSetting.SecuritySettings.form.label.email': 'Email',
   'userSetting.SecuritySettings.placeholder.email':
     'You have not set a mailbox yet. The mailbox binding can be used to retrieve passwords and receive notifications.',
+  'userSetting.form.submit.success': 'Save Success',
   'userSetting.SecuritySettings.button.settings': 'Settings',
   'userSetting.SecuritySettings.button.update': 'Update',
+  'userSetting.SecuritySettings.modal.password': 'Modify Password',
+  'userSetting.SecuritySettings.form.oldPassword': 'Old Password',
+  'userSetting.SecuritySettings.form.oldPassword.placeholder':
+    'Please enter old password',
+  'userSetting.SecuritySettings.form.newPassword': 'New Password',
+  'userSetting.SecuritySettings.form.newPassword.placeholder':
+    'Please enter new password',
+  'userSetting.SecuritySettings.form.confirmPassword': 'Confirm Password',
+  'userSetting.SecuritySettings.form.confirmPassword.placeholder':
+    'Please confirm new password',
+  'userSetting.SecuritySettings.form.match.errMsg': 'Password does not match',
+  'userSetting.SecuritySettings.form.newPassword.match.errMsg':
+    'New password cannot be the same as the old password',
   'userSetting.certification.title.enterprise':
     'Enterprise Real Name Authentication',
   'userSetting.certification.extra.enterprise':
     'Modifying an Authentication Body',
+  'userSetting.SecuritySettings.form.submit.success':'Modify Password Success',
+  'userSetting.SecuritySettings.form.submit.error':'Validation Failed',
   'userSetting.certification.label.accountType': 'Account Type',
   'userSetting.certification.label.status': 'status',
   'userSetting.certification.label.time': 'time',

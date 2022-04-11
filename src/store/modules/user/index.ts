@@ -2,8 +2,9 @@ import { defineStore } from 'pinia';
 import { userLogin, userLogout } from '@/api/public';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
-import { initUserInfo } from '@/api/user';
+import { initUserInfo, updateUser } from '@/api/user';
 import { LoginRequest } from '@/types/public';
+import { UserRequest } from '@/types/user';
 import { UserState } from './types';
 
 const useUserStore = defineStore('user', {
@@ -69,6 +70,13 @@ const useUserStore = defineStore('user', {
       this.resetInfo();
       clearToken();
       removeRouteListener();
+    },
+
+    // update
+    async update(req: UserRequest) {
+      req.id = this.userInfo.id;
+      await updateUser(req);
+      this.info();
     },
   },
 });

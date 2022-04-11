@@ -196,12 +196,8 @@
   import useLoading from '@/hooks/loading';
   import { getCaptcha, userRegister } from '@/api/public';
   import { LoginRequest, RegisterRequest } from '@/types/public';
+  import { mobilePattern, emailPattern, usernamePattern } from '@/types/global';
 
-  const emailPattern = new RegExp(
-    '^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6}$'
-  );
-  const mobilePattern = new RegExp('^1([3456789])\\d{9}$');
-  const usernamePattern = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{4,15}$');
   const router = useRouter();
   const { t } = useI18n();
   const errorMessage = ref('');
