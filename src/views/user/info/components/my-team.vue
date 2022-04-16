@@ -1,13 +1,13 @@
 <template>
   <a-card
     class="general-card"
-    :title="$t('userInfo.tab.title.team')"
+    :title="$t('userInfo.tab.title.group')"
     :header-style="{ paddingBottom: '18px' }"
     :body-style="{ paddingBottom: '12px' }"
   >
     <a-list :bordered="false">
       <a-list-item
-        v-for="team in teamList"
+        v-for="team in defaultValue"
         :key="team.id"
         action-layout="horizontal"
       >
@@ -35,27 +35,26 @@
 </template>
 
 <script lang="ts" setup>
-  import { queryMyTeamList, MyTeamRecord } from '@/api/user-center';
-  import useRequest from '@/hooks/request';
+  import { MyTeamRecord } from '@/api/user-center';
 
-  const defaultValue: MyTeamRecord[] = new Array(4).fill({});
-  const { loading, response: teamList } = useRequest<MyTeamRecord[]>(
-    queryMyTeamList,
-    defaultValue
-  );
+  const loading = false;
+  const defaultValue: MyTeamRecord[] = new Array(0).fill({});
 </script>
 
 <style scoped lang="less">
   .general-card {
     height: 356px;
+
     .arco-list-item {
       height: 72px;
-      padding-left: 0;
       padding-bottom: 12px;
+      padding-left: 0;
       border-bottom: 1px solid var(--color-neutral-3);
+
       &:last-child {
         border-bottom: none;
       }
+
       .arco-list-item-meta {
         padding: 0;
       }

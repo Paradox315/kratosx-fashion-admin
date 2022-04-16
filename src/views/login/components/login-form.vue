@@ -214,7 +214,7 @@
 
   const userInfo = reactive({
     username: 'admin',
-    password: '123456',
+    password: '123456789',
     captcha_id: '',
     captcha: '',
   });

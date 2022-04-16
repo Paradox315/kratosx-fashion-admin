@@ -1,11 +1,11 @@
 <template>
-  <a-card class="general-card" :title="$t('userInfo.title.myProject')">
+  <a-card class="general-card" :title="$t('userInfo.title.myFigure')">
     <template #extra>
       <a-link>{{ $t('userInfo.showMore') }}</a-link>
     </template>
     <a-row :gutter="16">
       <a-col
-        v-for="(project, index) in projectList"
+        v-for="(project, index) in defaultValue"
         :key="index"
         :xs="12"
         :sm="12"
@@ -36,25 +36,26 @@
                 </a-avatar>
               </a-avatar-group>
               <a-typography-text type="secondary">
-                等{{ project.peopleNumber }}人
+                {{ project.peopleNumber }}
               </a-typography-text>
             </a-space>
           </a-space>
         </a-card>
       </a-col>
+      <a-result v-if="!defaultValue.length || !defaultValue" status="404">
+        <template #subtitle>
+          {{ $t('userInfo.nodata') }}
+        </template>
+      </a-result>
     </a-row>
   </a-card>
 </template>
 
 <script lang="ts" setup>
-  import { queryMyProjectList, MyProjectRecord } from '@/api/user-center';
-  import useRequest from '@/hooks/request';
+  import { MyProjectRecord } from '@/api/user-center';
 
-  const defaultValue = Array(6).fill({} as MyProjectRecord);
-  const { loading, response: projectList } = useRequest<MyProjectRecord[]>(
-    queryMyProjectList,
-    defaultValue
-  );
+  const loading = false;
+  const defaultValue = Array(0).fill({} as MyProjectRecord);
 </script>
 
 <style scoped lang="less">
@@ -62,6 +63,7 @@
     min-height: 128px;
     padding-bottom: 0;
   }
+
   .my-project {
     &-header {
       display: flex;

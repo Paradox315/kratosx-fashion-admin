@@ -75,7 +75,7 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
   import useLoading from '@/hooks/loading';
-  import { queryPopularList, PopularRecord } from '@/api/dashboard';
+  import { PopularRecord } from '@/api/dashboard';
 
   const type = ref('text');
   const { loading, setLoading } = useLoading();
@@ -83,8 +83,8 @@
   const fetchData = async (contentType: string) => {
     try {
       setLoading(true);
-      const { data } = await queryPopularList({ type: contentType });
-      renderList.value = data;
+      // const { data } = await queryPopularList({ type: contentType });
+      // renderList.value = data;
     } catch (err) {
       // you can report use errorHandler or other
     } finally {
@@ -101,15 +101,19 @@
   .general-card {
     min-height: 388px;
   }
+
   :deep(.arco-table-tr) {
     height: 44px;
+
     .arco-typography {
       margin-bottom: 0;
     }
   }
+
   .increases-cell {
     display: flex;
     align-items: center;
+
     span {
       margin-right: 4px;
     }

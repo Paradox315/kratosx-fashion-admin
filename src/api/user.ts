@@ -51,12 +51,6 @@ export function updateStatus(params: StatusRequest) {
 
 export function getLogList(pageNum: number, pageSize: number) {
   return axios.get<ListLoginLogReply, HttpResponse<ListLoginLogReply>>(
-    `${prefix}/log/list`,
-    {
-      params: {
-        pageNum,
-        pageSize,
-      },
-    }
+    `${prefix}/log/list/${pageNum}/${pageSize}`
   );
 }

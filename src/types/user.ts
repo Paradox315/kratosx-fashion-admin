@@ -16,7 +16,7 @@ export interface QueryOptionInterval {
 }
 
 export interface ProtobufAny {
-  "@type"?: string;
+  '@type'?: string;
 }
 
 export interface RpcStatus {
@@ -34,10 +34,10 @@ export interface IDReply {
 
 export interface ListSearchRequest {
   /** @format int64 */
-  pageNum?: number;
+  page_num: number;
 
   /** @format int64 */
-  page_size?: number;
+  page_size: number;
   query?: QueryOption[];
 }
 
@@ -52,7 +52,7 @@ export interface PasswordRequest {
   id?: string;
   old_password?: string;
   new_password?: string;
-  confirm_password?:string;
+  confirm_password?: string;
 }
 
 export interface QueryOption {
@@ -85,9 +85,10 @@ export interface UserReply {
 
   /** @format int64 */
   status?: number;
+  creator?: string;
   created_at?: string;
   updated_at?: string;
-  user_roles?: UserRole[];
+  roles?: UserRole[];
 }
 
 export interface UserRequest {
@@ -104,27 +105,21 @@ export interface UserRequest {
 
   /** @format int64 */
   status?: number;
-  user_roles?: UserRoleID[];
+  roles?: string[];
 }
 
 export interface UserRole {
   id?: string;
   name?: string;
-  description?: string;
 }
 
-export interface UserRoleID {
-  id?: string;
-  user_id?: string;
-  role_id?: string;
-}
-
-export interface Position{
+export interface Position {
   lat?: number;
   lng?: number;
 }
 
 export interface LoginLogReply {
+  id?: string;
   ip?: string;
   country?: string;
   region?: string;
@@ -138,7 +133,7 @@ export interface LoginLogReply {
   login_type?: number;
 }
 
-export interface ListLoginLogReply{
+export interface ListLoginLogReply {
   list?: LoginLogReply[];
   total?: number;
 }

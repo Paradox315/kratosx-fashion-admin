@@ -200,7 +200,7 @@
     if (!errors) {
       setLoading(true);
       try {
-        userStore.update(values);
+        await userStore.update(values);
         Message.success(t('userSetting.form.submit.success'));
       } catch (err) {
         errorMessage.value = (err as Error).message;

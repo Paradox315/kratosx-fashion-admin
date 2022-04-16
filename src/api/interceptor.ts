@@ -1,8 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
-import { getToken } from '@/utils/auth';
+import { clearToken, getToken, setToken } from '@/utils/auth';
 import { HttpResponse } from '@/types/response';
+import router from '@/router';
 
 if (import.meta.env.VITE_API_BASE_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -31,6 +32,12 @@ axios.interceptors.request.use(
 // add response interceptors
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
+    const newToken = response.headers['new-token'];
+    if (newToken) {
+      clearToken();
+      setToken(newToken);
+      window.location.reload();
+    }
     const res = response.data;
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200) {
@@ -38,8 +45,7 @@ axios.interceptors.response.use(
         content: res.message || 'Error',
         duration: 5 * 1000,
       });
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 401 && response.config.url !== '/api/system/v1/user/') {
+      if (res.code === 401) {
         Modal.error({
           title: 'Confirm logout',
           content:
@@ -47,7 +53,12 @@ axios.interceptors.response.use(
           okText: 'Re-Login',
           async onOk() {
             const userStore = useUserStore();
-            await userStore.logout();
+            if (res.message.indexOf('expired') > -1) {
+              clearToken();
+            } else {
+              await userStore.logout();
+            }
+            router.push('/login');
             window.location.reload();
           },
         });

@@ -120,7 +120,6 @@
   import { useUserStore } from '@/store';
   import { useI18n } from 'vue-i18n';
   import { reactive, ref } from 'vue';
-  import { PasswordRequest } from '@/types/user';
   import { FormInstance } from '@arco-design/web-vue/es/form';
   import { Message } from '@arco-design/web-vue';
   import { updatePassword } from '@/api/user';
@@ -143,7 +142,7 @@
   };
 
   const validateConfirmCheck = (
-    value: any | undefined,
+    value: any,
     callback: (error?: string) => void
   ) => {
     if (value === undefined) {
@@ -157,10 +156,7 @@
     callback();
   };
 
-  const validatePassword = (
-    value: any | undefined,
-    callback: (error?: string) => void
-  ) => {
+  const validatePassword = (value: any, callback: (error?: string) => void) => {
     if (value === undefined) {
       callback();
       return;

@@ -26,6 +26,11 @@ import locale500 from '@/views/exception/500/locale/zh-CN';
 import localeUserInfo from '@/views/user/info/locale/zh-CN';
 import localeUserSetting from '@/views/user/setting/locale/zh-CN';
 
+import localeSystemUser from '@/views/system/user/locale/zh-CN';
+import localeSystemRole from '@/views/system/role/locale/zh-CN';
+import localeSystemMenu from '@/views/system/menu/locale/zh-CN';
+import localeSystemPermission from '@/views/system/permission/locale/zh-CN';
+
 import localeSettings from './zh-CN/settings';
 
 export default {
@@ -37,6 +42,7 @@ export default {
   'menu.profile': '详情页',
   'menu.visualization': '数据可视化',
   'menu.user': '个人中心',
+  'menu.system': '系统管理',
   'navbar.docs': '文档中心',
   'navbar.action.locale': '切换为中文',
   ...localeSettings,
@@ -59,4 +65,8 @@ export default {
   ...locale500,
   ...localeUserInfo,
   ...localeUserSetting,
+  ...localeSystemUser,
+  ...localeSystemRole,
+  ...localeSystemMenu,
+  ...localeSystemPermission,
 };
