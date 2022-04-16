@@ -16,7 +16,7 @@ export default {
       meta: {
         locale: 'menu.visualization.dataAnalysis',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['admin'],
       },
     },
     {
@@ -27,7 +27,7 @@ export default {
       meta: {
         locale: 'menu.visualization.multiDimensionDataAnalysis',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['admin'],
       },
     },
   ],

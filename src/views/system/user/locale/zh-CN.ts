@@ -31,6 +31,8 @@ export default {
   'system.user.delUserFailed': '删除用户失败',
   'system.user.form.username.placeholder': '请输入用户名',
   'system.user.form.username.required': '请输入用户名',
+  'system.user.form.password.placeholder': '请输入密码',
+  'system.user.form.password.required': '请输入密码',
   'system.user.form.nickname.placeholder': '请输入昵称',
   'system.user.form.email.placeholder': '请输入邮箱',
   'system.user.form.email.required': '请输入邮箱',

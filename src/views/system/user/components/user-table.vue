@@ -37,7 +37,7 @@
     @page-change="onPageChange"
   >
     <template #avatar="{ record }">
-      <a-avatar shape="square" :size="100">
+      <a-avatar shape="square" :size="80">
         <img :src="record.avatar" alt="avatar" />
       </a-avatar>
     </template>
@@ -100,7 +100,7 @@
           },
           {
             match: usernamePattern,
-            message: $t('userSetting.basicInfo.form.error.email'),
+            message: $t('system.user.form.username.match'),
           },
         ]"
       >
@@ -108,6 +108,24 @@
           v-model="userForm.username"
           :placeholder="$t('system.user.form.username.placeholder')"
         />
+      </a-form-item>
+      <a-form-item
+        v-if="modalType === 2"
+        field="password"
+        :label="$t('system.user.password')"
+        :rules="[
+          {
+            required: true,
+            message: $t('system.user.form.password.required'),
+          },
+        ]"
+      >
+        <a-input-password
+          v-model="userForm.password"
+          :placeholder="$t('system.user.form.password.placeholder')"
+          allow-clear
+        >
+        </a-input-password>
       </a-form-item>
       <a-form-item field="nickname" :label="$t('system.user.nickname')">
         <a-input
@@ -226,6 +244,7 @@
           </template>
         </a-upload>
       </a-form-item>
+      {{ userForm }}
     </a-form>
   </a-modal>
 </template>
@@ -258,7 +277,6 @@
   import { Message, Modal } from '@arco-design/web-vue';
 
   const { t } = useI18n();
-
   const { loading, setLoading } = useLoading(true);
   const fileList = ref<FileItem[]>();
   const formRef = ref<FormInstance>();
@@ -316,8 +334,8 @@
     ...basePagination,
   });
   const scroll = {
-    x: 1600,
-    y: 1000,
+    x: '150%',
+    y: '100%',
   };
   const columns = [
     {
@@ -376,7 +394,7 @@
       title: t('system.table.actions'),
       slotName: 'optional',
       fixed: 'right',
-      width: 200,
+      width: 220,
     },
   ];
 
@@ -403,7 +421,7 @@
     try {
       const res = await getRoleList(params);
       roleList.value = res.metadata.list;
-      rolePagination.current = params.current + 1;
+      rolePagination.current = params.current;
       rolePagination.total = res.metadata.total;
     } catch (err) {
       // you can report use errorHandler or other
@@ -415,7 +433,8 @@
   fetchRole();
   // eslint-disable-next-line camelcase
   const onPageChange = (current: number) => {
-    fetchData({ page_num: current, page_size: pagination.pageSize });
+    pagination.current = current;
+    fetchData({ page_num: pagination.current, page_size: pagination.pageSize });
   };
   const loadMoreRoles = () => {
     rolePagination.total = rolePagination.total as number;
@@ -425,6 +444,7 @@
     ) {
       return;
     }
+    rolePagination.current += 1;
     fetchRole(rolePagination);
   };
 
@@ -505,6 +525,7 @@
     userForm.value = {
       id: '',
       username: '',
+      password: '123456',
       nickname: '',
       email: '',
       mobile: '',
@@ -550,7 +571,10 @@
         try {
           await deleteUser(id);
           Message.success(t('system.user.delUserSuccess'));
-          await fetchData();
+          await fetchData({
+            page_num: pagination.current,
+            page_size: pagination.pageSize,
+          });
         } catch (error) {
           Message.error(t('system.user.delUserFailed'));
         }
@@ -573,7 +597,10 @@
           Message.success(t('system.user.form.create'));
         }
         done();
-        await fetchData();
+        await fetchData({
+          page_num: pagination.current,
+          page_size: pagination.pageSize,
+        });
       } catch (err) {
         done(false);
       }

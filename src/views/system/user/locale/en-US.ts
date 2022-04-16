@@ -31,6 +31,8 @@ export default {
   'system.user.delUserFailed': 'Delete user failed',
   'system.user.form.username.placeholder': 'Please input Username',
   'system.user.form.username.required': 'Must input Username',
+  'system.user.form.password.placeholder': 'Please input Password',
+  'system.user.form.password.required': 'Must input Password',
   'system.user.form.nickname.placeholder': 'Please input Nickname',
   'system.user.form.email.placeholder': 'Please input Email',
   'system.user.form.email.required': 'Must input Email',
