@@ -1,4 +1,85 @@
 <template>
+  <a-row>
+    <a-col :flex="1">
+      <a-form
+        :model="queryForm"
+        :label-col-props="{ span: 6 }"
+        :wrapper-col-props="{ span: 18 }"
+        label-align="left"
+      >
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-form-item field="username" :label="$t('system.user.username')">
+              <a-input
+                v-model="queryForm.username"
+                :placeholder="$t('system.user.form.username.placeholder')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item field="email" :label="$t('system.user.email')">
+              <a-input
+                v-model="queryForm.email"
+                :placeholder="$t('system.user.form.email.placeholder')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item field="mobile" :label="$t('system.user.mobile')">
+              <a-input
+                v-model="queryForm.mobile"
+                :placeholder="$t('system.user.form.mobile.placeholder')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item field="status" :label="$t('system.user.status')">
+              <a-select
+                v-model="queryForm.status"
+                :options="statusOptions"
+                :placeholder="$t('system.user.form.status.placeholder')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item field="timeSpan" :label="$t('system.user.createTime')">
+              <a-range-picker
+                v-model="queryForm.timeSpan"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item field="gender" :label="$t('system.user.gender')">
+              <a-select
+                v-model="queryForm.gender"
+                :options="genderOptions"
+                :placeholder="$t('system.user.form.gender.placeholder')"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-col>
+    <a-divider style="height: 84px" direction="vertical" />
+    <a-col :flex="'86px'" style="text-align: right">
+      <a-space direction="vertical" :size="18">
+        <a-button type="primary" :loading="loading" @click="search">
+          <template #icon>
+            <icon-search />
+          </template>
+          {{ $t('searchTable.form.search') }}
+        </a-button>
+        <a-button @click="reset">
+          <template #icon>
+            <icon-refresh />
+          </template>
+          {{ $t('searchTable.form.reset') }}
+        </a-button>
+      </a-space>
+    </a-col>
+  </a-row>
+  <a-divider style="margin-top: 0" />
   <a-row style="margin-bottom: 16px">
     <a-col :span="16">
       <a-space>
@@ -8,38 +89,57 @@
           </template>
           {{ $t('system.table.create') }}
         </a-button>
-        <a-upload action="/">
-          <template #upload-button>
-            <a-button>
-              {{ $t('searchTable.operation.import') }}
-            </a-button>
+        <a-button
+          type="text"
+          status="danger"
+          :disabled="!showDelete"
+          @click="delUsers"
+        >
+          <template #icon>
+            <icon-delete />
           </template>
-        </a-upload>
+          {{ $t('system.table.delete') }}
+        </a-button>
       </a-space>
     </a-col>
     <a-col :span="8" style="text-align: right">
-      <a-button>
+      <a-button @click="openSetting">
         <template #icon>
-          <icon-download />
+          <icon-settings />
         </template>
-        {{ $t('searchTable.operation.download') }}
+        {{ $t('system.table.setting') }}
       </a-button>
     </a-col>
   </a-row>
   <a-table
     row-key="id"
     :columns="columns"
-    :scroll="scroll"
+    :scroll="setting.scroll"
+    :bordered="{ cell: setting.border }"
+    :hoverable="setting.hover"
+    :stripe="setting.stripe"
+    :size="setting.size"
+    :column-resizable="setting.columnResizable"
+    :row-selection="setting.checkbox ? rowSelection : undefined"
     :loading="loading"
-    :pagination="pagination"
     :data="renderData"
-    :bordered="false"
+    :pagination="pagination"
     @page-change="onPageChange"
+    @select="onSelect"
   >
     <template #avatar="{ record }">
       <a-avatar shape="square" :size="80">
         <img :src="record.avatar" alt="avatar" />
       </a-avatar>
+    </template>
+    <template #status="{ record }">
+      <span v-if="record.status === 2" class="circle"></span>
+      <span v-else-if="record.status === 1" class="circle pass"></span>
+      {{
+        record.status === 2
+          ? $t('system.table.status.disabled')
+          : $t('system.table.status.enabled')
+      }}
     </template>
     <template #roles="{ record }">
       <a-space direction="vertical">
@@ -56,7 +156,7 @@
         <a-button type="primary" @click="editInfo(record)"
           >{{ $t('system.table.edit') }}
         </a-button>
-        <a-button type="primary" @click="delUser(record.id)"
+        <a-button status="danger" type="primary" @click="delUser(record.id)"
           >{{ $t('system.table.delete') }}
         </a-button>
       </a-space>
@@ -64,6 +164,7 @@
   </a-table>
   <a-modal
     v-model:visible="visible"
+    :width="600"
     @before-ok="handleBeforeOk"
     @cancel="handleCancel"
   >
@@ -79,11 +180,11 @@
         :key="item.label"
         :label="item.label"
       >
-        <div v-if="item.label === $t('system.user.roles')">
+        <a-space v-if="item.label === $t('system.user.roles')">
           <a-tag v-for="role in item.value" :key="role.id">
             {{ role.name }}
           </a-tag>
-        </div>
+        </a-space>
         <span v-else>
           {{ item.value }}
         </span>
@@ -188,7 +289,7 @@
         <a-switch
           v-model="userForm.status"
           :checked-value="1"
-          :unchecked-value="0"
+          :unchecked-value="2"
         />
       </a-form-item>
       <a-form-item
@@ -244,23 +345,92 @@
           </template>
         </a-upload>
       </a-form-item>
-      {{ userForm }}
     </a-form>
   </a-modal>
+  <a-drawer
+    :visible="showSetting"
+    :width="500"
+    unmount-on-close
+    @ok="saveSetting"
+    @cancel="cancelSetting"
+  >
+    <template #title> {{ $t('system.table.setting') }} </template>
+    <a-form>
+      <a-form-item :label="$t('system.table.setting.border')" field="border">
+        <a-switch v-model="setting.border" />
+      </a-form-item>
+      <a-form-item :label="$t('system.table.setting.hover')" field="hover">
+        <a-switch v-model="setting.hover" />
+      </a-form-item>
+      <a-form-item :label="$t('system.table.setting.stripe')" field="stripe">
+        <a-switch v-model="setting.stripe" />
+      </a-form-item>
+      <a-form-item
+        :label="$t('system.table.setting.checkbox')"
+        field="checkbox"
+      >
+        <a-switch v-model="setting.checkbox" @change="checkboxChange" />
+      </a-form-item>
+      <a-form-item
+        :label="$t('system.table.setting.resizeColumn')"
+        field="columnResizable"
+      >
+        <a-switch v-model="setting.columnResizable" />
+      </a-form-item>
+      <a-form-item :label="$t('system.table.setting.size')" field="size">
+        <a-radio-group v-model="setting.size" type="button">
+          <a-radio value="mini">
+            {{ $t('system.table.setting.size.mini') }}
+          </a-radio>
+          <a-radio value="small">
+            {{ $t('system.table.setting.size.small') }}
+          </a-radio>
+          <a-radio value="middle">
+            {{ $t('system.table.setting.size.medium') }}
+          </a-radio>
+          <a-radio value="large">
+            {{ $t('system.table.setting.size.large') }}
+          </a-radio>
+        </a-radio-group>
+      </a-form-item>
+      <a-form-item :label="$t('system.table.setting.scroll')" field="scroll">
+        <a-space direction="vertical">
+          <a-input-number
+            v-model="setting.scroll.x"
+            :style="{ width: '320px' }"
+            :default-value="setting.scroll.x"
+            :step="100"
+            mode="button"
+            class="input-demo"
+          />
+          <a-input-number
+            v-model="setting.scroll.y"
+            :style="{ width: '320px' }"
+            :default-value="setting.scroll.y"
+            :step="100"
+            mode="button"
+            class="input-demo"
+          />
+        </a-space>
+      </a-form-item>
+    </a-form>
+  </a-drawer>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { computed, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
     Pagination,
     emailPattern,
     mobilePattern,
     usernamePattern,
+    Options,
   } from '@/types/global';
   import { RoleReply } from '@/types/role';
   import {
     ListSearchRequest,
+    QueryOption,
     UserReply,
     UserRequest,
     UserRole,
@@ -275,6 +445,7 @@
   import { uploadFile } from '@/api/public';
   import { FormInstance } from '@arco-design/web-vue/es/form';
   import { Message, Modal } from '@arco-design/web-vue';
+  import dayjs from 'dayjs';
 
   const { t } = useI18n();
   const { loading, setLoading } = useLoading(true);
@@ -282,6 +453,14 @@
   const formRef = ref<FormInstance>();
   const renderData = ref<UserReply[] | undefined>([]);
   const userForm = ref<UserRequest>({});
+  const queryForm = ref({
+    username: '',
+    email: '',
+    mobile: '',
+    status: '',
+    gender: '',
+    timeSpan: [],
+  });
   const userDesc = ref([
     {
       label: t('system.user.username'),
@@ -321,8 +500,11 @@
     },
   ]);
   const visible = ref(false);
+  const showSetting = ref(false);
+  const showDelete = ref(false);
   const modalType = ref(0);
   const roleList = ref<RoleReply[] | undefined>([]);
+  const selectedUsers = ref<string[]>([]);
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,
@@ -333,16 +515,24 @@
   const rolePagination = reactive({
     ...basePagination,
   });
-  const scroll = {
-    x: '150%',
-    y: '100%',
-  };
+  const setting = reactive({
+    border: false,
+    hover: true,
+    stripe: true,
+    checkbox: false,
+    columnResizable: true,
+    size: 'medium',
+    scroll: {
+      x: 1600,
+      y: 1000,
+    },
+  });
   const columns = [
     {
       title: t('system.user.id'),
       dataIndex: 'id',
       fixed: 'left',
-      width: 140,
+      width: 50,
     },
     {
       title: t('system.user.avatar'),
@@ -373,10 +563,12 @@
     {
       title: t('system.user.status'),
       dataIndex: 'status',
+      slotName: 'status',
     },
     {
       title: t('system.user.gender'),
       dataIndex: 'gender',
+      slotName: 'gender',
     },
     {
       title: t('system.user.createUser'),
@@ -397,7 +589,34 @@
       width: 220,
     },
   ];
-
+  const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+  });
+  const statusOptions = computed<Options[]>(() => [
+    {
+      label: t('system.table.status.enabled'),
+      value: '1',
+    },
+    {
+      label: t('system.table.status.disabled'),
+      value: '2',
+    },
+  ]);
+  const genderOptions = computed<Options[]>(() => [
+    {
+      label: t('system.user.gender.unknown'),
+      value: '0',
+    },
+    {
+      label: t('system.user.gender.female'),
+      value: '1',
+    },
+    {
+      label: t('system.user.gender.male'),
+      value: '2',
+    },
+  ]);
   const fetchData = async (
     params: ListSearchRequest = { page_num: 1, page_size: 10 }
   ) => {
@@ -581,6 +800,25 @@
       },
     });
   };
+  const delUsers = () => {
+    Modal.warning({
+      title: t('system.modal.user.delete.title'),
+      content: t('system.modal.user.delete.content'),
+      onOk: async () => {
+        try {
+          const ids = selectedUsers.value.map((id) => id).join(',');
+          await deleteUser(ids);
+          Message.success(t('system.user.delUserSuccess'));
+          await fetchData({
+            page_num: pagination.current,
+            page_size: pagination.pageSize,
+          });
+        } catch (error) {
+          Message.error(t('system.user.delUserFailed'));
+        }
+      },
+    });
+  };
   const handleBeforeOk = async (done: any) => {
     if (modalType.value === 0) {
       done();
@@ -611,6 +849,92 @@
   };
   const handleCancel = () => {
     visible.value = false;
+  };
+  const buildQuery = () => {
+    const queryOpts: Array<QueryOption> = [];
+    if (queryForm.value.username !== '') {
+      queryOpts.push({
+        field: 'username',
+        value: queryForm.value.username,
+        opt: 'LIKE',
+      });
+    }
+    if (queryForm.value.email !== '') {
+      queryOpts.push({
+        field: 'email',
+        value: queryForm.value.email,
+        opt: 'EQ',
+      });
+    }
+    if (queryForm.value.mobile !== '') {
+      queryOpts.push({
+        field: 'mobile',
+        value: queryForm.value.mobile,
+        opt: 'EQ',
+      });
+    }
+    if (queryForm.value.status !== '') {
+      queryOpts.push({
+        field: 'status',
+        value: queryForm.value.status,
+        opt: 'EQ',
+      });
+    }
+    if (queryForm.value.timeSpan && queryForm.value.timeSpan.length > 0) {
+      const { timeSpan } = queryForm.value;
+      const startTime = dayjs(timeSpan[0]).format('YYYY-MM-DD HH:mm:ss');
+      const endTime = dayjs(timeSpan[1]).format('YYYY-MM-DD HH:mm:ss');
+      queryOpts.push({
+        field: 'created_at',
+        interval: {
+          from: startTime,
+          to: endTime,
+        },
+        opt: 'BETWEEN',
+      });
+    }
+    if (queryForm.value.gender !== '') {
+      queryOpts.push({
+        field: 'gender',
+        value: queryForm.value.gender,
+        opt: 'EQ',
+      });
+    }
+    return queryOpts;
+  };
+  const search = () => {
+    const queryOptions = buildQuery();
+    fetchData({
+      page_num: pagination.current,
+      page_size: pagination.pageSize,
+      query: queryOptions,
+    });
+  };
+  const reset = () => {
+    queryForm.value = {
+      username: '',
+      email: '',
+      mobile: '',
+      status: '',
+      gender: '',
+      timeSpan: [],
+    };
+  };
+  const openSetting = () => {
+    showSetting.value = true;
+  };
+  const saveSetting = () => {
+    showSetting.value = false;
+  };
+  const cancelSetting = () => {
+    showSetting.value = false;
+  };
+  const onSelect = (rowKeys: string[]) => {
+    showDelete.value = true;
+    selectedUsers.value = rowKeys;
+  };
+  const checkboxChange = () => {
+    showDelete.value = setting.checkbox && selectedUsers.value.length > 0;
   };
 </script>
 

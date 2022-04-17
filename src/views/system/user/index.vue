@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['menu.system', 'menu.system.user']" />
-    <a-card class="general-card" :title="$t('menu.list.searchTable')">
+    <a-card class="general-card" :title="$t('system.user.description')">
       <UserTable></UserTable>
     </a-card>
   </div>
