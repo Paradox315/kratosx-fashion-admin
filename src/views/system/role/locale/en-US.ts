@@ -1,3 +1,23 @@
 export default {
   'menu.system.role': 'Role',
+  'system.role.title': 'Role management',
+  'system.role.permission.setting': 'Permission setting',
+  'system.role.name': 'Role name',
+  'system.role.description': 'Role description',
+  'system.role.createdAt': 'Create time',
+  'system.role.updatedAt': 'Update time',
+  'system.role.menu': 'Role menu',
+  'system.role.router': 'Role router',
+  'system.role.form.name.required': 'Role name is required',
+  'system.role.form.name.placeholder': 'Please enter the role name',
+  'system.role.form.description.placeholder':
+    'Please enter the role description',
+  'system.role.create.success': 'Create role success',
+  'system.role.update.success': 'Update role success',
+  'system.permission.update.success': 'Update permission success',
+  'system.permission.update.fail': 'Update permission fail',
+  'system.role.delete.success': 'Delete role success',
+  'system.role.delete.fail': 'Delete role fail',
+  'system.role.delete.title': 'Delete role',
+  'system.role.delete.content': 'Are you sure to delete the role?',
 };

@@ -89,8 +89,8 @@ export default {
     'Enterprise Real Name Authentication',
   'userSetting.certification.extra.enterprise':
     'Modifying an Authentication Body',
-  'userSetting.SecuritySettings.form.submit.success':'Modify Password Success',
-  'userSetting.SecuritySettings.form.submit.error':'Validation Failed',
+  'userSetting.SecuritySettings.form.submit.success': 'Modify Password Success',
+  'userSetting.SecuritySettings.form.submit.error': 'Validation Failed',
   'userSetting.certification.label.accountType': 'Account Type',
   'userSetting.certification.label.status': 'status',
   'userSetting.certification.label.time': 'time',

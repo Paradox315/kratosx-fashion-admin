@@ -27,7 +27,11 @@ export default {
   'system.table.create': '创建',
   'system.table.edit': '编辑',
   'system.table.delete': '删除',
+  'system.table.deleteBatch': '批量删除',
   'system.table.view': '查看',
+  'system.table.order': '排序',
+  'system.table.order.desc': '降序',
+  'system.table.order.asc': '升序',
   'system.table.setting': '设置',
   'system.table.setting.hover': '悬停效果',
   'system.table.setting.stripe': '斑马纹',
@@ -61,7 +65,7 @@ export default {
   'system.user.form.roles.required': '必须选择角色',
   'system.user.form.update': '修改成功',
   'system.user.form.create': '创建成功',
-  'system.user.form.validate.error': '表单校验失败',
+  'system.form.validate.error': '表单校验失败',
   'system.user.form.username.match':
     '用户名必须以字母开头，只能包含字母、数字和下划线',
 };

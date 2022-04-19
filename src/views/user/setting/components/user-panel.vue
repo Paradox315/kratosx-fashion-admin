@@ -4,6 +4,7 @@
       <a-upload
         :custom-request="customRequest"
         list-type="picture-card"
+        accept="image/png,image/jpg"
         :file-list="fileList"
         :show-upload-button="true"
         :show-file-list="false"

@@ -98,7 +98,7 @@
           <template #icon>
             <icon-delete />
           </template>
-          {{ $t('system.table.delete') }}
+          {{ $t('system.table.deleteBatch') }}
         </a-button>
       </a-space>
     </a-col>
@@ -165,6 +165,7 @@
   <a-modal
     v-model:visible="visible"
     :width="600"
+    unmount-on-close
     @before-ok="handleBeforeOk"
     @cancel="handleCancel"
   >
@@ -316,6 +317,7 @@
         <a-upload
           :custom-request="uploadAvatar"
           list-type="picture-card"
+          accept="image/png,image/jpg"
           :file-list="fileList"
           :show-upload-button="true"
           :show-file-list="false"
@@ -350,6 +352,7 @@
   <a-drawer
     :visible="showSetting"
     :width="500"
+    :footer="false"
     unmount-on-close
     @ok="saveSetting"
     @cancel="cancelSetting"
@@ -518,7 +521,7 @@
   const setting = reactive({
     border: false,
     hover: true,
-    stripe: true,
+    stripe: false,
     checkbox: false,
     columnResizable: true,
     size: 'medium',
@@ -591,7 +594,7 @@
   ];
   const rowSelection = reactive({
     type: 'checkbox',
-    showCheckedAll: true,
+    showCheckedAll: false,
   });
   const statusOptions = computed<Options[]>(() => [
     {
@@ -624,7 +627,6 @@
     try {
       const res = await getUserList(params);
       renderData.value = res.metadata.list;
-      pagination.current = params.page_num;
       pagination.total = res.metadata.total;
     } catch (err) {
       // you can report use errorHandler or other
@@ -806,13 +808,13 @@
       content: t('system.modal.user.delete.content'),
       onOk: async () => {
         try {
-          const ids = selectedUsers.value.map((id) => id).join(',');
-          await deleteUser(ids);
+          await deleteUser(selectedUsers.value.join(','));
           Message.success(t('system.user.delUserSuccess'));
           await fetchData({
             page_num: pagination.current,
             page_size: pagination.pageSize,
           });
+          showDelete.value = false;
         } catch (error) {
           Message.error(t('system.user.delUserFailed'));
         }
@@ -843,7 +845,7 @@
         done(false);
       }
     } else {
-      Message.error(t('system.user.form.validate.error'));
+      Message.error(t('system.form.validate.error'));
     }
     done();
   };

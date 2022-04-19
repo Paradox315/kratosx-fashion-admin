@@ -29,6 +29,6 @@ export function updateRole(data: RoleRequest) {
   return axios.put<IDReply, HttpResponse<IDReply>>(`${prefix}/`, data);
 }
 
-export function deleteRole(id: number) {
+export function deleteRole(id: string) {
   return axios.delete<EmptyReply, HttpResponse<EmptyReply>>(`${prefix}/${id}`);
 }
