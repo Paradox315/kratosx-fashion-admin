@@ -17,6 +17,10 @@ export default {
   'system.permission.update.fail': '更新权限失败',
   'system.role.delete.success': '删除角色成功',
   'system.role.delete.fail': '删除角色失败',
+  'system.router.fetch.fail': '获取路由失败',
+  'system.role.router.fetch.fail': '获取角色路由失败',
+  'system.role.fetch.fail': '获取角色失败',
+  'system.role.menu.fetch.fail': '获取角色菜单失败',
   'system.role.delete.title': '删除角色',
   'system.role.delete.content': '确定删除角色吗？',
 };

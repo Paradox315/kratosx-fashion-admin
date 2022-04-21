@@ -18,6 +18,10 @@ export default {
   'system.permission.update.fail': 'Update permission fail',
   'system.role.delete.success': 'Delete role success',
   'system.role.delete.fail': 'Delete role fail',
+  'system.router.fetch.fail': 'Fetch router fail',
+  'system.role.router.fetch.fail': 'Fetch role router fail',
+  'system.role.fetch.fail': 'Fetch role fail',
+  'system.role.menu.fetch.fail': 'Fetch role menu fail',
   'system.role.delete.title': 'Delete role',
   'system.role.delete.content': 'Are you sure to delete the role?',
 };

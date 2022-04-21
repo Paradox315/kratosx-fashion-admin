@@ -173,9 +173,13 @@
       </a-form-item>
     </a-form>
     <a-tabs v-else lazy-load>
-      <!-- TODO: 菜单管理完成后添加 -->
       <a-tab-pane key="1" :title="$t('system.role.menu')">
-        Content of Tab Panel 1
+        <a-tree
+          v-model:checked-keys="checkedMenus"
+          default-expand-all
+          :checkable="true"
+          :data="menuTree"
+        />
       </a-tab-pane>
       <a-tab-pane key="2" :title="$t('system.role.router')">
         <a-tree
@@ -206,9 +210,13 @@
     TreeNodeData,
     Tag,
   } from '@arco-design/web-vue';
-  import { Router, RouterGroup } from '@/types/resource';
-  import { getRouterTree, getRouterTreeByRole } from '@/api/resource';
-  import Error from '@/views/result/error/index.vue';
+  import { Menu, Router, RouterGroup } from '@/types/resource';
+  import {
+    getMenuTree,
+    getMenuTreeByRole,
+    getRouterTree,
+    getRouterTreeByRole,
+  } from '@/api/resource';
   import {
     IconDelete,
     IconPlus,
@@ -220,7 +228,9 @@
   const formRef = ref<FormInstance>();
   const renderData = ref<RoleReply[] | undefined>([]);
   const routerTree = ref<TreeNodeData[]>([]);
+  const menuTree = ref<TreeNodeData[]>([]);
   const checkedRouters = ref<string[]>([]);
+  const checkedMenus = ref<string[]>([]);
   const roleForm = ref<RoleRequest>({});
   const showModal = ref<boolean>(false);
   const showDrawer = ref<boolean>(false);
@@ -294,7 +304,7 @@
       pagination.current = params.current;
       pagination.total = res.metadata.total;
     } catch (err) {
-      Message.error((err as Error).message);
+      Message.error(t('system.role.fetch.fail'));
     } finally {
       setLoading(false);
     }
@@ -365,7 +375,32 @@
       const { routers } = res.metadata;
       buildRouterTree(routers);
     } catch (err) {
-      Message.error((err as Error).message);
+      Message.error(t('system.router.fetch.fail'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const buildMenuTree = (menus?: Menu[]) => {
+    const buildChildTree = (menu: Menu): TreeNodeData => {
+      return {
+        title: menu.name,
+        key: menu.id,
+        children: menu.children?.map((child) => buildChildTree(child)),
+      };
+    };
+    menus?.forEach((menu: Menu) => {
+      menuTree.value.push(buildChildTree(menu));
+    });
+  };
+  const fetchMenus = async () => {
+    setLoading(true);
+    try {
+      const res = await getMenuTree();
+      const menus = res.metadata.tree;
+      buildMenuTree(menus);
+    } catch (err) {
+      Message.error(t('system.router.fetch.fail'));
     } finally {
       setLoading(false);
     }
@@ -373,6 +408,7 @@
 
   fetchData();
   fetchRouters();
+  fetchMenus();
 
   const onPageChange = (current: number) => {
     pagination.current = current;
@@ -384,6 +420,8 @@
     isPermission.value = false;
     showDrawer.value = true;
   };
+
+  // 设置角色权限
   const savePermission = async () => {
     checkedRouters.value.forEach((router) => {
       const routerObj: Router = JSON.parse(router);
@@ -391,6 +429,15 @@
         roleForm.value.role_routers = [];
       }
       roleForm.value.role_routers.push(routerObj);
+    });
+    checkedMenus.value.forEach((menuId) => {
+      if (!roleForm.value.role_resources) {
+        roleForm.value.role_resources = [];
+      }
+      roleForm.value.role_resources.push({
+        resource_id: menuId,
+        resource_type: 0,
+      });
     });
     if (
       roleForm.value.id?.length === 0 ||
@@ -510,6 +557,11 @@
     showModal.value = true;
     resetRoleForm();
   };
+  const buildCheckedMenus = (menus?: Menu[]) => {
+    menus?.forEach((menu: Menu) => {
+      checkedMenus.value.push(menu.id as string);
+    });
+  };
   const buildCheckedRouters = (routers?: Router[]) => {
     routers?.forEach((router: Router) => {
       checkedRouters.value.push(
@@ -524,14 +576,23 @@
   const getPermission = async (id: string) => {
     isPermission.value = true;
     showDrawer.value = true;
-    const res = await getRouterTreeByRole(id);
-    const routers = res.metadata.role_routers;
-    resetRoleForm();
-    checkedRouters.value = [];
-    buildCheckedRouters(routers);
-    roleForm.value = {
-      id,
-    };
+    try {
+      const res1 = await getMenuTreeByRole(id);
+      const res2 = await getRouterTreeByRole(id);
+      const menus = res1.metadata.tree;
+      const routers = res2.metadata.role_routers;
+      resetRoleForm();
+      checkedRouters.value = [];
+      checkedMenus.value = [];
+      buildCheckedRouters(routers);
+      buildCheckedMenus(menus);
+      roleForm.value = {
+        id,
+      };
+    } catch (e) {
+      Message.error(t('system.role.router.fail'));
+      showDrawer.value = false;
+    }
   };
 
   const handleBeforeOk = async (done: any) => {

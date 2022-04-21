@@ -36,4 +36,7 @@ export default {
   'system.menu.add.fail': 'Add Menu Fail',
   'system.menu.edit.fail': 'Edit Menu Fail',
   'system.menu.delete.fail': 'Delete Menu Fail',
+  'system.menu.fetch.fail': 'Fetch Menu Fail',
+  'system.menu.delete.title': 'Delete Menu',
+  'system.menu.delete.content': 'Are you sure to delete this menu?',
 };
