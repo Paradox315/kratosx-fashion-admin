@@ -1,11 +1,24 @@
 <template>
-  <div>menu</div>
+  <div class="container">
+    <Breadcrumb :items="['menu.system', 'menu.system.menu']" />
+    <a-card class="general-card" :title="$t('menu.system.menu')">
+      <MenuTable></MenuTable>
+    </a-card>
+  </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+  import MenuTable from '@/views/system/menu/components/menu-table.vue';
+</script>
+
+<script lang="ts">
   export default {
-    name: 'Index',
+    name: 'Menu',
   };
 </script>
 
-<style scoped></style>
+<style scoped>
+  .container {
+    padding: 0 20px 20px 20px;
+  }
+</style>

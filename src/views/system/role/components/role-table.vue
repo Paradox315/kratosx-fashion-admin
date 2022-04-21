@@ -90,7 +90,7 @@
           :placeholder="$t('system.role.form.name.placeholder')"
         />
       </a-form-item>
-      <a-form-item :label="$t('system.role.description')">
+      <a-form-item field="description" :label="$t('system.role.description')">
         <a-input
           v-model="roleForm.description"
           :placeholder="$t('system.role.form.description.placeholder')"
@@ -143,7 +143,7 @@
           <a-radio value="small">
             {{ $t('system.table.setting.size.small') }}
           </a-radio>
-          <a-radio value="middle">
+          <a-radio value="medium">
             {{ $t('system.table.setting.size.medium') }}
           </a-radio>
           <a-radio value="large">
@@ -193,7 +193,7 @@
 <script lang="ts" setup>
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { h, reactive, ref, VNode } from 'vue';
+  import { h, reactive, ref } from 'vue';
   import { FormInstance } from '@arco-design/web-vue/es/form';
   import { RoleReply, RoleRequest } from '@/types/role';
   import { Pagination } from '@/types/global';
@@ -211,10 +211,7 @@
   import Error from '@/views/result/error/index.vue';
   import {
     IconDelete,
-    IconEdit,
-    IconEye,
     IconPlus,
-    IconPlusCircleFill,
     IconQuestion,
   } from '@arco-design/web-vue/es/icon';
 
@@ -310,7 +307,7 @@
           method: group.method,
           path: group.path,
         }),
-        children: group.router?.map((router) => {
+        children: group.children?.map((router) => {
           return {
             title: router.name,
             key: JSON.stringify({
@@ -555,8 +552,8 @@
       }
     } else {
       Message.error(t('system.form.validate.error'));
+      done(false);
     }
-    done();
   };
 </script>
 

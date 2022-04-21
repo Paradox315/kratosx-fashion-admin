@@ -31,6 +31,7 @@ import localeSystemRole from '@/views/system/role/locale/zh-CN';
 import localeSystemMenu from '@/views/system/menu/locale/zh-CN';
 import localeSystemPermission from '@/views/system/permission/locale/zh-CN';
 
+import localeIcon from '@/components/icon-picker/locale/zh-CN';
 import localeSettings from './zh-CN/settings';
 
 export default {
@@ -49,6 +50,7 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeWorkplace,
+  ...localeIcon,
 
   ...localeMonitor,
   ...localeSearchTable,

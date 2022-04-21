@@ -6,7 +6,7 @@ export default {
     locale: 'menu.system',
     icon: 'icon-command',
     requiresAuth: true,
-    order: 8,
+    order: 1,
   },
   children: [
     {

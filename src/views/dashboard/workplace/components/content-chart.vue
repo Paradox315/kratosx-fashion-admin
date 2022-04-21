@@ -20,10 +20,11 @@
   import { ref } from 'vue';
   import { graphic } from 'echarts';
   import useLoading from '@/hooks/loading';
-  import { queryContentData, ContentDataRecord } from '@/api/dashboard';
   import useChartOption from '@/hooks/chart-option';
   import { ToolTipFormatterParams } from '@/types/echarts';
   import { AnyObject } from '@/types/global';
+  import dayjs from 'dayjs';
+  import { ContentDataRecord } from '@/api/dashboard';
 
   function graphicFactory(side: AnyObject) {
     return {
@@ -177,7 +178,17 @@
   const fetchData = async () => {
     setLoading(true);
     try {
-      const { data: chartData } = await queryContentData();
+      const presetData = [58, 81, 53, 90, 64, 88, 49, 79];
+      const getLineData = () => {
+        const count = 8;
+        return new Array(count).fill(0).map((el, idx) => ({
+          x: dayjs()
+            .day(idx - 2)
+            .format('YYYY-MM-DD'),
+          y: presetData[idx],
+        }));
+      };
+      const chartData = [...getLineData()];
       chartData.forEach((el: ContentDataRecord, idx: number) => {
         xAxis.value.push(el.x);
         chartsData.value.push(el.y);

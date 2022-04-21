@@ -388,7 +388,7 @@
           <a-radio value="small">
             {{ $t('system.table.setting.size.small') }}
           </a-radio>
-          <a-radio value="middle">
+          <a-radio value="medium">
             {{ $t('system.table.setting.size.medium') }}
           </a-radio>
           <a-radio value="large">
@@ -845,9 +845,9 @@
         done(false);
       }
     } else {
+      done(false);
       Message.error(t('system.form.validate.error'));
     }
-    done();
   };
   const handleCancel = () => {
     visible.value = false;

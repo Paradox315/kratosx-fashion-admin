@@ -31,6 +31,7 @@ import localeSystemRole from '@/views/system/role/locale/en-US';
 import localeSystemMenu from '@/views/system/menu/locale/en-US';
 import localeSystemPermission from '@/views/system/permission/locale/en-US';
 
+import localeIcon from '@/components/icon-picker/locale/en-US';
 import localeSettings from './en-US/settings';
 
 export default {
@@ -49,6 +50,7 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeWorkplace,
+  ...localeIcon,
 
   ...localeMonitor,
   ...localeSearchTable,

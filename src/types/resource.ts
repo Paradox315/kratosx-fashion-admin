@@ -96,7 +96,7 @@ export interface RouterGroup {
   path?: string;
   name?: string;
   method?: string;
-  router?: Router[];
+  children?: Router[];
 }
 
 export interface RouterReply {

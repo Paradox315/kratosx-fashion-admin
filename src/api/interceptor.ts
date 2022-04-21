@@ -47,13 +47,12 @@ axios.interceptors.response.use(
       });
       if (res.code === 401) {
         Modal.error({
-          title: 'Confirm logout',
-          content:
-            'You have been logged out, you can cancel to stay on this page, or log in again',
-          okText: 'Re-Login',
+          title: '认证鉴权失败',
+          content: '您没有权限访问当前资源或者登录已过期，请重新登录',
+          okText: '重新登录',
           async onOk() {
             const userStore = useUserStore();
-            if (res.message.indexOf('expired') > -1) {
+            if (res?.reason === 'JWT_AUTH_ERROR') {
               clearToken();
             } else {
               await userStore.logout();
