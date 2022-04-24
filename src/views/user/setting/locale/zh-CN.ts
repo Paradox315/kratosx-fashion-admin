@@ -77,8 +77,8 @@ export default {
   'userSetting.SecuritySettings.form.match.errMsg': '密码不匹配',
   'userSetting.SecuritySettings.form.newPassword.match.errMsg':
     '新密码不能与旧密码一致',
-  'userSetting.SecuritySettings.form.submit.success':'修改密码成功',
-  'userSetting.SecuritySettings.form.submit.error':'参数校验失败',
+  'userSetting.SecuritySettings.form.submit.success': '修改密码成功',
+  'userSetting.SecuritySettings.form.submit.error': '参数校验失败',
   'userSetting.certification.title.enterprise': '企业实名认证',
   'userSetting.certification.extra.enterprise': '修改认证主体',
   'userSetting.certification.label.accountType': '账号类型',

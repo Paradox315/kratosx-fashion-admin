@@ -59,8 +59,8 @@
           status="success"
           @click="getPermission(record.id)"
         >
-          {{ $t('system.role.permission.setting') }}</a-button
-        >
+          {{ $t('system.role.permission.setting') }}
+        </a-button>
         <a-button status="danger" type="primary" @click="delRole(record.id)"
           >{{ $t('system.table.delete') }}
         </a-button>
@@ -174,12 +174,30 @@
     </a-form>
     <a-tabs v-else lazy-load>
       <a-tab-pane key="1" :title="$t('system.role.menu')">
-        <a-tree
-          v-model:checked-keys="checkedMenus"
-          default-expand-all
-          :checkable="true"
-          :data="menuTree"
-        />
+        <a-space direction="vertical" size="large" style="width: 100%">
+          <a-card
+            ><a-tree
+              v-model:checked-keys="checkedMenus"
+              block-node
+              default-expand-all
+              :checkable="true"
+              :data="menuTree"
+              @select="menuNodeSelect"
+            />
+          </a-card>
+          <a-card v-if="menuAction.get(selectedMenu)">
+            <a-checkbox-group v-model="checkedActs" direction="vertical">
+              <a-checkbox
+                v-for="(act, index) of menuAction.get(selectedMenu)"
+                :key="index"
+                :value="act.code"
+              >
+                {{ act.name }}
+                <a-tag>{{ act.code }}</a-tag>
+              </a-checkbox>
+            </a-checkbox-group>
+          </a-card>
+        </a-space>
       </a-tab-pane>
       <a-tab-pane key="2" :title="$t('system.role.router')">
         <a-tree
@@ -210,7 +228,7 @@
     TreeNodeData,
     Tag,
   } from '@arco-design/web-vue';
-  import { Menu, Router, RouterGroup } from '@/types/resource';
+  import { Menu, MenuAction, Router, RouterGroup } from '@/types/resource';
   import {
     getMenuTree,
     getMenuTreeByRole,
@@ -229,8 +247,11 @@
   const renderData = ref<RoleReply[] | undefined>([]);
   const routerTree = ref<TreeNodeData[]>([]);
   const menuTree = ref<TreeNodeData[]>([]);
+  const menuAction = ref<Map<string, MenuAction[] | undefined>>(new Map());
+  const selectedMenu = ref<string>('');
   const checkedRouters = ref<string[]>([]);
   const checkedMenus = ref<string[]>([]);
+  const checkedActs = ref<string[]>([]);
   const roleForm = ref<RoleRequest>({});
   const showModal = ref<boolean>(false);
   const showDrawer = ref<boolean>(false);
@@ -393,12 +414,26 @@
       menuTree.value.push(buildChildTree(menu));
     });
   };
+
+  const buildMenuAction = (menus?: Menu[]) => {
+    const buildChildAction = (menu: Menu) => {
+      menu.children?.forEach((child) => {
+        menuAction.value.set(child.id as string, child.actions);
+      });
+      buildMenuAction(menu.children);
+    };
+    menus?.forEach((menu: Menu) => {
+      buildChildAction(menu);
+    });
+  };
+
   const fetchMenus = async () => {
     setLoading(true);
     try {
       const res = await getMenuTree();
       const menus = res.metadata.tree;
       buildMenuTree(menus);
+      buildMenuAction(menus);
     } catch (err) {
       Message.error(t('system.router.fetch.fail'));
     } finally {
@@ -439,9 +474,19 @@
         resource_type: 0,
       });
     });
+    checkedActs.value.forEach((actId) => {
+      if (!roleForm.value.role_resources) {
+        roleForm.value.role_resources = [];
+      }
+      roleForm.value.role_resources.push({
+        resource_id: actId,
+        resource_type: 1,
+      });
+    });
     if (
       roleForm.value.id?.length === 0 ||
-      roleForm.value?.role_routers?.length === 0
+      (roleForm.value.role_routers?.length === 0 &&
+        roleForm.value.role_resources?.length === 0)
     ) {
       Message.error(t('system.role.update.fail'));
       return;
@@ -593,6 +638,10 @@
       Message.error(t('system.role.router.fail'));
       showDrawer.value = false;
     }
+  };
+
+  const menuNodeSelect = (selectedMenus: Array<string | number>) => {
+    selectedMenu.value = selectedMenus[0] as string;
   };
 
   const handleBeforeOk = async (done: any) => {

@@ -52,8 +52,8 @@
           v-for="(roleId, index) of record.meta.roles"
           :key="index"
           :color="'#70a1ff'"
-          >roleID:{{ roleId }}</a-tag
-        >
+          >roleID:{{ roleId }}
+        </a-tag>
       </a-space>
     </template>
     <template #optional="{ record }">
@@ -235,7 +235,6 @@
         </a-form-item>
       </a-form-item>
     </a-form>
-    {{ menuForm }}
   </a-modal>
   <a-drawer
     :visible="showDrawer"
