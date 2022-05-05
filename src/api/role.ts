@@ -1,34 +1,33 @@
 import { Pagination } from '@/types/global';
 import axios from 'axios';
 import {
-  EmptyReply,
   IDReply,
   ListRoleReply,
   RoleReply,
   RoleRequest,
-} from '@/types/role';
-import { HttpResponse } from '@/types/response';
+} from '@/api/model/role';
+import service from '@/utils/service';
 
 const prefix = '/api/system/v1/role';
 
 export function getRoleList(params: Pagination) {
-  return axios.get<ListRoleReply, HttpResponse<ListRoleReply>>(
+  return service.get<ListRoleReply>(
     `${prefix}/list/${params.current}/${params.pageSize}`
   );
 }
 
 export function getRole(id: number) {
-  return axios.get<RoleReply, HttpResponse<RoleReply>>(`${prefix}/${id}`);
+  return service.get<RoleReply>(`${prefix}/${id}`);
 }
 
 export function createRole(data: RoleRequest) {
-  return axios.post<IDReply, HttpResponse<IDReply>>(`${prefix}/`, data);
+  return service.post<IDReply>(`${prefix}/`, data);
 }
 
 export function updateRole(data: RoleRequest) {
-  return axios.put<IDReply, HttpResponse<IDReply>>(`${prefix}/`, data);
+  return service.put(`${prefix}/`, data);
 }
 
 export function deleteRole(id: string) {
-  return axios.delete<EmptyReply, HttpResponse<EmptyReply>>(`${prefix}/${id}`);
+  return service.delete(`${prefix}/${id}`);
 }

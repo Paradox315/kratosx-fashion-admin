@@ -15,12 +15,12 @@
             <template #trigger-icon>
               <icon-camera />
             </template>
-            <img v-if="fileList.length" :src="fileList[0].url" />
+            <img v-if="fileList.length" :src="fileList[0].url" alt="avatar" />
           </a-avatar>
         </template>
       </a-upload>
       <a-descriptions
-        :data="renderData"
+        :data="userDesc"
         :column="2"
         align="right"
         layout="inline-horizontal"
@@ -61,12 +61,12 @@
   import { uploadFile } from '@/api/public';
 
   const userStore = useUserStore();
-  const file = {
+  const file: FileItem = {
     uid: '',
     name: 'avatar.png',
     url: userStore.avatar,
   };
-  const renderData = reactive([
+  const userDesc = reactive([
     {
       label: 'userSetting.label.name',
       value: computed(() => userStore.nickname || userStore.username),
@@ -84,6 +84,18 @@
       value: computed(() => userStore.email),
     },
     {
+      label: 'userSetting.label.country',
+      value: computed(() => userStore.country),
+    },
+    {
+      label: 'userSetting.label.city',
+      value: computed(() => userStore.city),
+    },
+    {
+      label: 'userSetting.label.address',
+      value: computed(() => userStore.address),
+    },
+    {
       label: 'userSetting.label.certification',
       value: '',
     },
@@ -94,6 +106,14 @@
     {
       label: 'userSetting.label.gender',
       value: computed(() => userStore.gender),
+    },
+    {
+      label: 'userSetting.label.age',
+      value: computed(() => userStore.age),
+    },
+    {
+      label: 'userSetting.basicInfo.form.label.birthday',
+      value: computed(() => userStore.birthday),
     },
   ]);
   const fileList = ref<FileItem[]>([file]);

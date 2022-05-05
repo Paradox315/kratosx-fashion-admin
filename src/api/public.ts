@@ -2,48 +2,42 @@ import axios from 'axios';
 import { HttpResponse } from '@/types/response';
 import {
   CaptchaReply,
-  LoginRequest,
   LoginReply,
+  LoginRequest,
+  RefreshReply,
+  RefreshRequest,
   RegisterRequest,
-  RegisterReply,
   UploadReply,
-} from '@/types/public';
+} from '@/api/model/public';
+import service from '@/utils/service';
 
 const prefix = '/api/system/v1/pub';
 
 export function getCaptcha() {
-  return axios.get<CaptchaReply, HttpResponse<CaptchaReply>>(
-    `${prefix}/captcha`
-  );
+  return service.get<CaptchaReply>(`${prefix}/captcha`);
 }
 
 export function userRegister(data: RegisterRequest) {
-  return axios.post<RegisterReply, HttpResponse<RegisterReply>>(
-    `${prefix}/register`,
-    data
-  );
+  return service.post(`${prefix}/register`, data);
+}
+
+export function refreshToken(data: RefreshRequest) {
+  return service.post<RefreshReply>(`${prefix}/refresh-token`, data);
 }
 
 export function userLogin(data: LoginRequest) {
-  return axios.post<LoginReply, HttpResponse<LoginReply>>(
-    `${prefix}/login`,
-    data
-  );
+  return service.post<LoginReply>(`${prefix}/login`, data);
 }
 
 export function userLogout() {
-  return axios.post<void, HttpResponse<void>>(`${prefix}/logout`);
+  return service.put(`${prefix}/logout`);
 }
 
 export function uploadFile(
   data: FormData,
   onUploadProgress?: (progressEvent: any) => void
 ) {
-  return axios.post<UploadReply, HttpResponse<UploadReply>>(
-    `${prefix}/upload`,
-    data,
-    {
-      onUploadProgress,
-    }
-  );
+  return service.post<UploadReply>(`${prefix}/upload`, data, {
+    onUploadProgress,
+  });
 }

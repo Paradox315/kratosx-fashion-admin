@@ -2,7 +2,7 @@
   <div class="header">
     <a-space :size="12" direction="vertical" align="center">
       <a-avatar :size="64">
-        <img :src="userInfo.avatar" />
+        <img :src="userInfo.avatar" alt="avatar" />
       </a-avatar>
       <a-typography-title :heading="6" style="margin: 0">
         {{ userInfo.name }}
@@ -11,17 +11,19 @@
         <a-space :size="18">
           <div>
             <icon-user />
-            <a-typography-text>{{ userInfo.jobName }}</a-typography-text>
+            <a-typography-text>{{ userInfo.address }}</a-typography-text>
           </div>
           <div>
             <icon-home />
             <a-typography-text>
-              {{ userInfo.organizationName }}
+              {{ userInfo.description }}
             </a-typography-text>
           </div>
           <div>
             <icon-location />
-            <a-typography-text>{{ userInfo.locationName }}</a-typography-text>
+            <a-typography-text
+              >{{ userInfo.country }}{{ userInfo.city }}</a-typography-text
+            >
           </div>
         </a-space>
       </div>

@@ -16,6 +16,36 @@
     "application/json"
   ],
   "paths": {
+    "/action/role/{id}": {
+      "get": {
+        "operationId": "Resource_GetActionByRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMenuActionReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Resource"
+        ]
+      }
+    },
     "/menu": {
       "get": {
         "operationId": "Resource_GetMenuTree",
@@ -73,7 +103,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1IDReply"
+              "$ref": "#/definitions/v1EmptyReply"
             }
           },
           "default": {
@@ -98,7 +128,7 @@
         ]
       }
     },
-    "/menu/list/{pageNum}/{pageSize}": {
+    "/menu/list/{current}/{pageSize}": {
       "get": {
         "operationId": "Resource_ListMenu",
         "responses": {
@@ -117,7 +147,7 @@
         },
         "parameters": [
           {
-            "name": "pageNum",
+            "name": "current",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -138,7 +168,7 @@
     },
     "/menu/role/{id}": {
       "get": {
-        "operationId": "Resource_GetMenuTreeByRole",
+        "operationId": "Resource_GetMenuByRole",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -218,7 +248,7 @@
         ]
       }
     },
-    "/router/list/{pageNum}/{pageSize}": {
+    "/router/list/{current}/{pageSize}": {
       "get": {
         "operationId": "Resource_ListRoute",
         "responses": {
@@ -237,7 +267,7 @@
         },
         "parameters": [
           {
-            "name": "pageNum",
+            "name": "current",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -258,7 +288,7 @@
     },
     "/router/role/{id}": {
       "get": {
-        "operationId": "Resource_GetRouteTreeByRole",
+        "operationId": "Resource_GetRouteByRole",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -322,7 +352,23 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1ListMenuActionReply": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -360,10 +406,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "parentId": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "path": {
           "type": "string"
@@ -372,6 +420,9 @@
           "type": "string"
         },
         "component": {
+          "type": "string"
+        },
+        "description": {
           "type": "string"
         },
         "meta": {
@@ -383,17 +434,17 @@
             "$ref": "#/definitions/v1Menu"
           }
         },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        },
         "actions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1MenuAction"
           }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       }
     },
@@ -414,7 +465,8 @@
         "roles": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "format": "uint64"
           }
         },
         "requireAuth": {
@@ -444,7 +496,7 @@
     "v1MenuReply": {
       "type": "object",
       "properties": {
-        "tree": {
+        "list": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Menu"
@@ -456,10 +508,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "parentId": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "path": {
           "type": "string"
@@ -468,6 +522,9 @@
           "type": "string"
         },
         "component": {
+          "type": "string"
+        },
+        "description": {
           "type": "string"
         },
         "meta": {
@@ -510,10 +567,10 @@
         "name": {
           "type": "string"
         },
-        "methods": {
+        "method": {
           "type": "string"
         },
-        "router": {
+        "children": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Router"
@@ -528,6 +585,12 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1RouterGroup"
+          }
+        },
+        "roleRouters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Router"
           }
         }
       }

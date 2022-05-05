@@ -9,21 +9,16 @@
  * ---------------------------------------------------------------
  */
 
-export interface ProtobufAny {
-  '@type'?: string;
-}
-
-export interface RpcStatus {
-  /** @format int32 */
-  code?: number;
-  message?: string;
-  details?: ProtobufAny[];
-}
-
-export type EmptyReply = object;
-
 export interface IDReply {
+  /** @format uint64 */
   id?: string;
+}
+
+export interface ListMenuActionReply {
+  list?: string[];
+
+  /** @format int64 */
+  total?: number;
 }
 
 export interface ListMenuReply {
@@ -41,16 +36,20 @@ export interface ListRouterReply {
 }
 
 export interface Menu {
+  /** @format uint64 */
   id?: string;
-  parent_id?: string;
+
+  /** @format uint64 */
+  parentId?: string;
   path?: string;
   name?: string;
   component?: string;
+  description?: string;
   meta?: MenuMeta;
   children?: Menu[];
-  created_at?: string;
-  updated_at?: string;
   actions?: MenuAction[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface MenuAction {
@@ -60,27 +59,31 @@ export interface MenuAction {
 
 export interface MenuMeta {
   roles?: string[];
-  require_auth?: boolean;
+  requireAuth?: boolean;
   icon?: string;
   locale?: string;
 
   /** @format int64 */
   order?: number;
-  hide_in_menu?: boolean;
-  no_affix?: boolean;
-  ignore_cache?: boolean;
+  hideInMenu?: boolean;
+  noAffix?: boolean;
+  ignoreCache?: boolean;
 }
 
 export interface MenuReply {
-  tree?: Menu[];
+  list?: Menu[];
 }
 
 export interface MenuRequest {
-  id?: string;
-  parent_id?: string;
+  /** @format uint64 */
+  id?: string | number;
+
+  /** @format uint64 */
+  parentId?: string | number;
   path?: string;
   name?: string;
   component?: string;
+  description?: string;
   meta?: MenuMeta;
   actions?: MenuAction[];
 }
@@ -101,5 +104,5 @@ export interface RouterGroup {
 
 export interface RouterReply {
   routers?: RouterGroup[];
-  role_routers?: Router[];
+  roleRouters?: Router[];
 }

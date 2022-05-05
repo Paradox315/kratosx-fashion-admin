@@ -2,7 +2,7 @@
   <router-view>
     <template #default>
       <router-view v-slot="{ Component, route }">
-        <transition name="fade" mode="out-in" appear>
+        <SlideInOut>
           <component
             :is="Component"
             v-if="route.meta.ignoreCache"
@@ -11,7 +11,7 @@
           <keep-alive v-else :include="cacheList">
             <component :is="Component" :key="route.fullPath" />
           </keep-alive>
-        </transition>
+        </SlideInOut>
       </router-view>
     </template>
   </router-view>
@@ -20,6 +20,7 @@
 <script lang="ts" setup>
   import { computed } from 'vue';
   import { useTabBarStore } from '@/store';
+  import { FadeInOut, SlideInOut } from 'vue3-transitions';
 
   const tabBarStore = useTabBarStore();
 

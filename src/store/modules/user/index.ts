@@ -1,24 +1,36 @@
 import { defineStore } from 'pinia';
 import { userLogin, userLogout } from '@/api/public';
-import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { initUserInfo, updateUser } from '@/api/user';
-import { LoginRequest } from '@/types/public';
-import { UserRequest } from '@/types/user';
-import { UserState } from './types';
+import { LoginRequest } from '@/api/model/public';
+import { UserRequest, UserState } from '@/api/model/user';
+import {
+  clearAccessToken,
+  clearRefreshToken,
+  setAccessToken,
+  setRefreshToken,
+} from '@/utils/auth';
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
+    /** @format uint64 */
     id: undefined,
     username: undefined,
-    avatar: undefined,
     email: undefined,
     mobile: undefined,
+    avatar: undefined,
     nickname: undefined,
     gender: undefined,
+    creator: undefined,
+    address: '未知',
+    country: '中国',
+    city: '上海',
+    description: '这里是描述',
+    status: true,
+    birthday: undefined,
 
     /** @format int64 */
-    status: undefined,
+    age: 0,
     registerDate: undefined,
     roles: undefined,
   }),
@@ -56,9 +68,11 @@ const useUserStore = defineStore('user', {
     async login(loginForm: LoginRequest) {
       try {
         const res = await userLogin(loginForm);
-        setToken(<string>res.metadata.token?.access_token);
+        setAccessToken(res.metadata.accessToken);
+        setRefreshToken(res.metadata.refreshToken);
       } catch (err) {
-        clearToken();
+        clearAccessToken();
+        clearRefreshToken();
         throw err;
       }
     },
@@ -68,7 +82,8 @@ const useUserStore = defineStore('user', {
       await userLogout();
 
       this.resetInfo();
-      clearToken();
+      clearRefreshToken();
+      clearAccessToken();
       removeRouteListener();
     },
 
@@ -76,7 +91,7 @@ const useUserStore = defineStore('user', {
     async update(req: UserRequest) {
       req.id = this.userInfo.id;
       await updateUser(req);
-      this.info();
+      await this.info();
     },
   },
 });

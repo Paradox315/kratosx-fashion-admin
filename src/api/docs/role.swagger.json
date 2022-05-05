@@ -53,7 +53,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1IDReply"
+              "$ref": "#/definitions/v1EmptyReply"
             }
           },
           "default": {
@@ -78,7 +78,7 @@
         ]
       }
     },
-    "/list/{pageNum}/{pageSize}": {
+    "/list/{current}/{pageSize}": {
       "get": {
         "operationId": "Role_ListRole",
         "responses": {
@@ -97,7 +97,7 @@
         },
         "parameters": [
           {
-            "name": "pageNum",
+            "name": "current",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -212,7 +212,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -235,7 +236,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "name": {
           "type": "string"
@@ -248,12 +250,6 @@
         },
         "updatedAt": {
           "type": "string"
-        },
-        "roleResources": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1RoleResource"
-          }
         }
       }
     },
@@ -261,7 +257,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "name": {
           "type": "string"
@@ -269,13 +266,13 @@
         "description": {
           "type": "string"
         },
-        "roleResources": {
+        "resources": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1RoleResource"
           }
         },
-        "roleRouters": {
+        "routers": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Router"
@@ -286,12 +283,6 @@
     "v1RoleResource": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
-        "roleId": {
-          "type": "string"
-        },
         "resourceId": {
           "type": "string"
         },

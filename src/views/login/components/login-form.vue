@@ -59,7 +59,6 @@
           </a-input>
           <div class="pic">
             <img
-              v-if="captcha.src"
               :src="captcha.src"
               :alt="$t('login.form.captcha.alt')"
               @click="captcha.refresh"
@@ -75,20 +74,22 @@
           type="text"
           long
           class="login-form-register-btn"
-          @click="handleClick"
+          @click="openModal"
         >
           {{ $t('login.form.register') }}
         </a-button>
       </a-space>
     </a-form>
     <a-modal
-      v-model:visible="visible"
+      v-model:visible="showModal"
       :title="$t('login.form.register')"
-      :footer="false"
       unmount-on-close
-      @cancel="handleCancel"
+      :ok-loading="loading"
+      :ok-text="$t('login.form.register')"
+      @cancel="showModal = false"
+      @ok="handleRegister"
     >
-      <a-form :model="registerInfo" @submit="handleRegisterSubmit">
+      <a-form ref="formRef" :model="registerInfo">
         <a-form-item
           field="username"
           :label="$t('login.form.register.username')"
@@ -178,16 +179,13 @@
             </div>
           </div>
         </a-form-item>
-        <a-button type="primary" html-type="submit" :loading="loading">
-          提交
-        </a-button>
       </a-form>
     </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -195,51 +193,46 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import { getCaptcha, userRegister } from '@/api/public';
-  import { LoginRequest, RegisterRequest } from '@/types/public';
+  import { LoginRequest, RegisterRequest } from '@/api/model/public';
   import { mobilePattern, emailPattern, usernamePattern } from '@/types/global';
+  import { FormInstance } from '@arco-design/web-vue/es/form';
+  import { useToggle } from '@vueuse/core';
 
   const router = useRouter();
   const { t } = useI18n();
   const errorMessage = ref('');
   const { loading, setLoading } = useLoading();
+  const [showModal] = useToggle();
   const userStore = useUserStore();
 
-  const visible = ref(false);
-  const handleClick = () => {
-    visible.value = true;
-  };
-  const handleCancel = () => {
-    visible.value = false;
-  };
-
-  const userInfo = reactive({
+  const formRef = ref<FormInstance>();
+  const userInfo = reactive<LoginRequest>({
     username: 'admin',
-    password: '123456789',
-    captcha_id: '',
+    password: '123456',
+    captchaId: '',
     captcha: '',
   });
-
-  const registerInfo = reactive({
+  const registerInfo = reactive<RegisterRequest>({
     username: '',
     password: '',
     mobile: '',
     email: '',
-    captcha_id: '',
+    captchaId: '',
     captcha: '',
   });
-
   const captcha = reactive({
     src: '',
     refresh: async () => {
       const res = await getCaptcha();
-      userInfo.captcha_id = res.metadata.captcha_id;
-      registerInfo.captcha_id = res.metadata.captcha_id;
-      captcha.src = res.metadata.pic_path as string;
+      userInfo.captchaId = res.metadata.captchaId;
+      registerInfo.captchaId = res.metadata.captchaId;
+      captcha.src = res.metadata.picPath as string;
     },
   });
-
-  captcha.refresh();
-
+  const openModal = () => {
+    formRef.value?.resetFields();
+    showModal.value = true;
+  };
   // 提交表单
   const handleSubmit = async ({
     errors,
@@ -267,27 +260,25 @@
       }
     }
   };
-
-  const handleRegisterSubmit = async ({
-    errors,
-    values,
-  }: {
-    errors: Record<string, ValidatedError> | undefined;
-    values: RegisterRequest;
-  }) => {
-    if (!errors) {
-      setLoading(true);
-      try {
-        await userRegister(values);
-        Message.success(t('login.form.register.success'));
-        visible.value = false;
-      } catch (err) {
-        errorMessage.value = (err as Error).message;
-      } finally {
-        setLoading(false);
+  const handleRegister = () => {
+    formRef.value?.validate(async (errors: any) => {
+      if (!errors) {
+        setLoading(true);
+        try {
+          await userRegister(registerInfo);
+          Message.success(t('login.form.register.success'));
+          showModal.value = false;
+        } catch (err) {
+          errorMessage.value = (err as Error).message;
+        } finally {
+          setLoading(false);
+        }
       }
-    }
+    });
   };
+  onMounted(() => {
+    captcha.refresh();
+  });
 </script>
 
 <style lang="less" scoped>

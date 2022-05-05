@@ -11,7 +11,7 @@
         <a-button
           type="text"
           status="danger"
-          :disabled="!showDelete"
+          :disabled="disableDeleteBtn"
           @click="delRoles"
         >
           <template #icon>
@@ -22,7 +22,7 @@
       </a-space>
     </a-col>
     <a-col :span="8" style="text-align: right">
-      <a-button @click="openSetting">
+      <a-button @click="setSetting(true)">
         <template #icon>
           <icon-settings />
         </template>
@@ -41,9 +41,15 @@
     :column-resizable="setting.columnResizable"
     :row-selection="setting.checkbox ? rowSelection : undefined"
     :loading="loading"
-    :data="renderData"
-    :pagination="pagination"
-    @page-change="onPageChange"
+    :data="roles"
+    :pagination="{
+      pageSize: pageSize,
+      total: total,
+      current: current,
+      showPageSize: true,
+    }"
+    @page-change="changeCurrent"
+    @page-size-change="changePageSize"
     @select="onSelect"
   >
     <template #optional="{ record }">
@@ -57,7 +63,7 @@
         <a-button
           type="primary"
           status="success"
-          @click="getPermission(record.id)"
+          @click="showResource(record.id)"
         >
           {{ $t('system.role.permission.setting') }}
         </a-button>
@@ -70,7 +76,8 @@
   <a-modal
     v-model:visible="showModal"
     :width="600"
-    :on-before-ok="handleBeforeOk"
+    :ok-loading="loading"
+    :on-before-ok="handleRoleSubmit"
     unmount-on-close
   >
     <template #title>{{ $t('system.role.title') }}</template>
@@ -98,186 +105,76 @@
       </a-form-item>
     </a-form>
   </a-modal>
-  <a-drawer
-    :visible="showDrawer"
-    :width="500"
-    unmount-on-close
-    :footer="isPermission"
-    @ok="savePermission"
-    @cancel="cancelPermission"
-  >
-    <template #title>
-      {{
-        isPermission
-          ? $t('system.role.permission.setting')
-          : $t('system.table.setting')
-      }}
-    </template>
-    <a-form v-if="!isPermission">
-      <a-form-item :label="$t('system.table.setting.border')" field="border">
-        <a-switch v-model="setting.border" />
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.hover')" field="hover">
-        <a-switch v-model="setting.hover" />
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.stripe')" field="stripe">
-        <a-switch v-model="setting.stripe" />
-      </a-form-item>
-      <a-form-item
-        :label="$t('system.table.setting.checkbox')"
-        field="checkbox"
-      >
-        <a-switch v-model="setting.checkbox" @change="checkboxChange" />
-      </a-form-item>
-      <a-form-item
-        :label="$t('system.table.setting.resizeColumn')"
-        field="columnResizable"
-      >
-        <a-switch v-model="setting.columnResizable" />
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.size')" field="size">
-        <a-radio-group v-model="setting.size" type="button">
-          <a-radio value="mini">
-            {{ $t('system.table.setting.size.mini') }}
-          </a-radio>
-          <a-radio value="small">
-            {{ $t('system.table.setting.size.small') }}
-          </a-radio>
-          <a-radio value="medium">
-            {{ $t('system.table.setting.size.medium') }}
-          </a-radio>
-          <a-radio value="large">
-            {{ $t('system.table.setting.size.large') }}
-          </a-radio>
-        </a-radio-group>
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.scroll')" field="scroll">
-        <a-space direction="vertical">
-          <a-input-number
-            v-model="setting.scroll.x"
-            :style="{ width: '320px' }"
-            :default-value="setting.scroll.x"
-            :step="100"
-            mode="button"
-            class="input-demo"
-          />
-          <a-input-number
-            v-model="setting.scroll.y"
-            :style="{ width: '320px' }"
-            :default-value="setting.scroll.y"
-            :step="100"
-            mode="button"
-            class="input-demo"
-          />
-        </a-space>
-      </a-form-item>
-    </a-form>
-    <a-tabs v-else lazy-load>
-      <a-tab-pane key="1" :title="$t('system.role.menu')">
-        <a-space direction="vertical" size="large" style="width: 100%">
-          <a-card
-            ><a-tree
-              v-model:checked-keys="checkedMenus"
-              block-node
-              default-expand-all
-              :checkable="true"
-              :data="menuTree"
-              @select="menuNodeSelect"
-            />
-          </a-card>
-          <a-card v-if="menuAction.get(selectedMenu)">
-            <a-checkbox-group v-model="checkedActs" direction="vertical">
-              <a-checkbox
-                v-for="(act, index) of menuAction.get(selectedMenu)"
-                :key="index"
-                :value="act.code"
-              >
-                {{ act.name }}
-                <a-tag>{{ act.code }}</a-tag>
-              </a-checkbox>
-            </a-checkbox-group>
-          </a-card>
-        </a-space>
-      </a-tab-pane>
-      <a-tab-pane key="2" :title="$t('system.role.router')">
-        <a-tree
-          v-model:checked-keys="checkedRouters"
-          default-expand-all
-          :data="routerTree"
-          :checkable="true"
-          checked-strategy="parent"
-        />
-      </a-tab-pane>
-    </a-tabs>
-  </a-drawer>
+  <TableSetting
+    v-model:setting="setting"
+    v-model:visible="showSetting"
+    @check-box-change="setDeleteBatch"
+  ></TableSetting>
+  <ResourceSetting
+    v-model:checked-obj="checkedObj"
+    v-model:visible="showResourceSetting"
+    v-model:role-id="roleId"
+  ></ResourceSetting>
 </template>
 
 <script lang="ts" setup>
   import { useI18n } from 'vue-i18n';
-  import useLoading from '@/hooks/loading';
-  import { h, reactive, ref } from 'vue';
+  import { computed, h, reactive, ref } from 'vue';
   import { FormInstance } from '@arco-design/web-vue/es/form';
-  import { RoleReply, RoleRequest } from '@/types/role';
-  import { Pagination } from '@/types/global';
+  import { RoleReply, RoleRequest } from '@/api/model/role';
   import { createRole, deleteRole, getRoleList, updateRole } from '@/api/role';
+  import { DescData, Modal, Descriptions, Message } from '@arco-design/web-vue';
+  import { Menu, Router } from '@/api/model/resource';
   import {
-    DescData,
-    Modal,
-    Descriptions,
-    Message,
-    TreeNodeData,
-    Tag,
-  } from '@arco-design/web-vue';
-  import { Menu, MenuAction, Router, RouterGroup } from '@/types/resource';
-  import {
-    getMenuTree,
+    getActionByRole,
     getMenuTreeByRole,
-    getRouterTree,
     getRouterTreeByRole,
   } from '@/api/resource';
-  import {
-    IconDelete,
-    IconPlus,
-    IconQuestion,
-  } from '@arco-design/web-vue/es/icon';
+  import { IconDelete, IconPlus } from '@arco-design/web-vue/es/icon';
+  import useTableSetting from '@/components/table-setting/table-setting';
+  import useDeleteBatch from '@/hooks/delete-batch';
+  import { createAsyncComponent } from '@/utils/factory';
+  import { usePagination } from 'vue-request';
 
+  const TableSetting = createAsyncComponent(
+    () => import('@/components/table-setting/index.vue')
+  );
+  const ResourceSetting = createAsyncComponent(
+    () => import('@/views/system/role/components/resource-setting.vue')
+  );
   const { t } = useI18n();
-  const { loading, setLoading } = useLoading(true);
-  const formRef = ref<FormInstance>();
-  const renderData = ref<RoleReply[] | undefined>([]);
-  const routerTree = ref<TreeNodeData[]>([]);
-  const menuTree = ref<TreeNodeData[]>([]);
-  const menuAction = ref<Map<string, MenuAction[] | undefined>>(new Map());
-  const selectedMenu = ref<string>('');
-  const checkedRouters = ref<string[]>([]);
-  const checkedMenus = ref<string[]>([]);
-  const checkedActs = ref<string[]>([]);
-  const roleForm = ref<RoleRequest>({});
-  const showModal = ref<boolean>(false);
-  const showDrawer = ref<boolean>(false);
-  const showDelete = ref<boolean>(false);
-  const selectedRoles = ref<string[]>([]);
-  const basePagination: Pagination = {
-    current: 1,
-    pageSize: 10,
-  };
-  const pagination = reactive({
-    ...basePagination,
-  });
-  const setting = reactive({
-    border: false,
-    hover: true,
-    stripe: false,
-    checkbox: false,
-    columnResizable: true,
-    size: 'medium',
-    scroll: {
-      x: 1000,
-      y: 1000,
+  const { setting, showSetting, setSetting } = useTableSetting();
+  const { deleteBatch, setDeleteBatch, resetDeleteBatch } = useDeleteBatch();
+  const {
+    data,
+    current,
+    pageSize,
+    loading,
+    total,
+    changeCurrent,
+    changePageSize,
+    refresh,
+  } = usePagination(getRoleList, {
+    pagination: {
+      totalKey: 'metadata.total',
     },
   });
+  const roles = computed(() => data.value?.metadata.list || []);
+  // form相关控件
+  const formRef = ref<FormInstance>();
+  const checkedObj = reactive({
+    checkedMenus: Array<string>(),
+    checkedRouters: Array<string>(),
+    checkedActs: Array<string>(),
+  });
+  const roleForm = reactive<RoleRequest>({});
+  const roleId = ref<string | number>(0);
+  // 弹窗相关
+  const showModal = ref(false);
+  const showResourceSetting = ref(false);
   const isEdit = ref(false);
-  const isPermission = ref(false);
+
+  const selectedRoles = ref<string[]>([]);
   const rowSelection = reactive({
     type: 'checkbox',
     showCheckedAll: false,
@@ -299,11 +196,11 @@
     },
     {
       title: t('system.role.createdAt'),
-      dataIndex: 'created_at',
+      dataIndex: 'createdAt',
     },
     {
       title: t('system.role.updatedAt'),
-      dataIndex: 'updated_at',
+      dataIndex: 'updatedAt',
     },
     {
       title: t('system.table.actions'),
@@ -313,211 +210,20 @@
     },
   ];
 
-  // 加载数据方法
-  // fetchData 获取表格数据
-  const fetchData = async (
-    params: Pagination = { current: 1, pageSize: 10 }
-  ) => {
-    setLoading(true);
-    try {
-      const res = await getRoleList(pagination);
-      renderData.value = res.metadata.list;
-      pagination.current = params.current;
-      pagination.total = res.metadata.total;
-    } catch (err) {
-      Message.error(t('system.role.fetch.fail'));
-    } finally {
-      setLoading(false);
-    }
-  };
-  const buildRouterTree = (routers?: RouterGroup[]) => {
-    routers?.forEach((group: RouterGroup) => {
-      const r: TreeNodeData = {
-        title: group.name,
-        key: JSON.stringify({
-          method: group.method,
-          path: group.path,
-        }),
-        children: group.children?.map((router) => {
-          return {
-            title: router.name,
-            key: JSON.stringify({
-              method: router.method,
-              path: router.path,
-            }),
-            icon: (): any => {
-              switch (router.method) {
-                case '(GET)':
-                  return h(
-                    Tag,
-                    {
-                      color: '#1abc9c',
-                    },
-                    () => 'GET'
-                  );
-                case '(POST)':
-                  return h(
-                    Tag,
-                    {
-                      color: '#ffa502',
-                    },
-                    () => 'POST'
-                  );
-                case '(PUT)':
-                  return h(
-                    Tag,
-                    {
-                      color: '#1e90ff',
-                    },
-                    () => 'PUT'
-                  );
-                case '(DELETE)':
-                  return h(
-                    Tag,
-                    {
-                      color: '#f5222d',
-                    },
-                    () => 'DELETE'
-                  );
-                default:
-                  return h(IconQuestion);
-              }
-            },
-          };
-        }),
-      };
-      routerTree.value.push(r);
-    });
-  };
-  const fetchRouters = async () => {
-    setLoading(true);
-    try {
-      const res = await getRouterTree();
-      const { routers } = res.metadata;
-      buildRouterTree(routers);
-    } catch (err) {
-      Message.error(t('system.router.fetch.fail'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const buildMenuTree = (menus?: Menu[]) => {
-    const buildChildTree = (menu: Menu): TreeNodeData => {
-      return {
-        title: menu.name,
-        key: menu.id,
-        children: menu.children?.map((child) => buildChildTree(child)),
-      };
-    };
-    menus?.forEach((menu: Menu) => {
-      menuTree.value.push(buildChildTree(menu));
-    });
-  };
-
-  const buildMenuAction = (menus?: Menu[]) => {
-    const buildChildAction = (menu: Menu) => {
-      menu.children?.forEach((child) => {
-        menuAction.value.set(child.id as string, child.actions);
-      });
-      buildMenuAction(menu.children);
-    };
-    menus?.forEach((menu: Menu) => {
-      buildChildAction(menu);
-    });
-  };
-
-  const fetchMenus = async () => {
-    setLoading(true);
-    try {
-      const res = await getMenuTree();
-      const menus = res.metadata.tree;
-      buildMenuTree(menus);
-      buildMenuAction(menus);
-    } catch (err) {
-      Message.error(t('system.router.fetch.fail'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-  fetchRouters();
-  fetchMenus();
-
-  const onPageChange = (current: number) => {
-    pagination.current = current;
-    fetchData(pagination);
-  };
-
-  // 属性方法
-  const openSetting = () => {
-    isPermission.value = false;
-    showDrawer.value = true;
-  };
-
-  // 设置角色权限
-  const savePermission = async () => {
-    checkedRouters.value.forEach((router) => {
-      const routerObj: Router = JSON.parse(router);
-      if (!roleForm.value.role_routers) {
-        roleForm.value.role_routers = [];
-      }
-      roleForm.value.role_routers.push(routerObj);
-    });
-    checkedMenus.value.forEach((menuId) => {
-      if (!roleForm.value.role_resources) {
-        roleForm.value.role_resources = [];
-      }
-      roleForm.value.role_resources.push({
-        resource_id: menuId,
-        resource_type: 0,
-      });
-    });
-    checkedActs.value.forEach((actId) => {
-      if (!roleForm.value.role_resources) {
-        roleForm.value.role_resources = [];
-      }
-      roleForm.value.role_resources.push({
-        resource_id: actId,
-        resource_type: 1,
-      });
-    });
-    if (
-      roleForm.value.id?.length === 0 ||
-      (roleForm.value.role_routers?.length === 0 &&
-        roleForm.value.role_resources?.length === 0)
-    ) {
-      Message.error(t('system.role.update.fail'));
-      return;
-    }
-    try {
-      await updateRole(roleForm.value);
-      Message.success(t('system.permission.update.success'));
-      showDrawer.value = false;
-    } catch (e) {
-      Message.error(t('system.permission.update.fail'));
-    }
-  };
-  const cancelPermission = () => {
-    showDrawer.value = false;
-    isPermission.value = false;
-  };
-  const onSelect = (rowKeys: string[]) => {
-    showDelete.value = true;
-    selectedRoles.value = rowKeys;
-  };
-  const checkboxChange = () => {
-    showDelete.value = setting.checkbox && selectedRoles.value.length > 0;
-  };
+  const disableDeleteBtn = computed(() => {
+    return selectedRoles.value.length === 0 || !deleteBatch.value;
+  });
   const resetRoleForm = () => {
-    roleForm.value = {
-      id: '',
-      name: '',
-      description: '',
-      role_resources: [],
-      role_routers: [],
-    };
+    roleForm.resources = [];
+    roleForm.routers = [];
+    roleForm.id = 0;
+    roleForm.name = '';
+    roleForm.description = '';
+  };
+  const resetChecked = () => {
+    checkedObj.checkedMenus = [];
+    checkedObj.checkedRouters = [];
+    checkedObj.checkedActs = [];
   };
 
   // viewInfo 查看角色信息
@@ -533,11 +239,11 @@
       },
       {
         label: t('system.role.createdAt'),
-        value: record.created_at as string,
+        value: record.createdAt as string,
       },
       {
         label: t('system.role.updatedAt'),
-        value: record.updated_at as string,
+        value: record.updatedAt as string,
       },
     ];
     Modal.open({
@@ -546,52 +252,8 @@
         return h(Descriptions, {
           data: roleDesc,
           title: t('system.role.title'),
-          column: { xs: 1, md: 3, lg: 4 },
+          column: 1,
         });
-      },
-    });
-  };
-
-  // editInfo 编辑角色信息
-  const editInfo = (record: RoleReply) => {
-    isEdit.value = true;
-    showModal.value = true;
-    roleForm.value = {
-      id: record.id,
-      name: record.name,
-      description: record.description,
-    };
-  };
-
-  // deleteRole 删除角色信息
-  const delRole = async (id: string) => {
-    Modal.warning({
-      title: t('system.role.delete.title'),
-      content: t('system.role.delete.content'),
-      onOk: async () => {
-        try {
-          await deleteRole(id);
-          await fetchData(pagination);
-        } catch (err) {
-          Message.error(t('system.role.delete.fail'));
-        }
-      },
-    });
-  };
-
-  // deleteRoles 删除多个角色
-  const delRoles = () => {
-    Modal.warning({
-      title: t('system.role.delete.title'),
-      content: t('system.role.delete.content'),
-      onOk: async () => {
-        try {
-          await deleteRole(selectedRoles.value.join(','));
-          await fetchData(pagination);
-          showDelete.value = false;
-        } catch (err) {
-          Message.error(t('system.role.delete.fail'));
-        }
       },
     });
   };
@@ -602,14 +264,54 @@
     showModal.value = true;
     resetRoleForm();
   };
+
+  // editInfo 编辑角色信息
+  const editInfo = (record: RoleReply) => {
+    isEdit.value = true;
+    showModal.value = true;
+    roleForm.id = record.id;
+    roleForm.name = record.name;
+    roleForm.description = record.description;
+  };
+
+  // deleteRole 删除角色信息
+  const delRole = async (id: string) => {
+    Modal.warning({
+      title: t('system.role.delete.title'),
+      content: t('system.role.delete.content'),
+      onOk: async () => {
+        await deleteRole(id);
+        await refresh();
+      },
+    });
+  };
+
+  // deleteRoles 删除多个角色
+  const delRoles = () => {
+    Modal.warning({
+      title: t('system.role.delete.title'),
+      content: t('system.role.delete.content'),
+      onOk: async () => {
+        await deleteRole(selectedRoles.value.join(','));
+        await refresh();
+        resetDeleteBatch();
+      },
+    });
+  };
+
   const buildCheckedMenus = (menus?: Menu[]) => {
     menus?.forEach((menu: Menu) => {
-      checkedMenus.value.push(menu.id as string);
+      checkedObj.checkedMenus.push(menu.id as string);
+    });
+  };
+  const buildCheckedActs = (acts?: string[]) => {
+    acts?.forEach((act: string) => {
+      checkedObj.checkedActs.push(act);
     });
   };
   const buildCheckedRouters = (routers?: Router[]) => {
     routers?.forEach((router: Router) => {
-      checkedRouters.value.push(
+      checkedObj.checkedRouters.push(
         JSON.stringify({
           method: router.method,
           path: router.path,
@@ -617,52 +319,42 @@
       );
     });
   };
-  // getPermission 设置角色权限
-  const getPermission = async (id: string) => {
-    isPermission.value = true;
-    showDrawer.value = true;
-    try {
-      const res1 = await getMenuTreeByRole(id);
-      const res2 = await getRouterTreeByRole(id);
-      const menus = res1.metadata.tree;
-      const routers = res2.metadata.role_routers;
-      resetRoleForm();
-      checkedRouters.value = [];
-      checkedMenus.value = [];
-      buildCheckedRouters(routers);
-      buildCheckedMenus(menus);
-      roleForm.value = {
-        id,
-      };
-    } catch (e) {
-      Message.error(t('system.role.router.fail'));
-      showDrawer.value = false;
-    }
-  };
 
-  const menuNodeSelect = (selectedMenus: Array<string | number>) => {
-    selectedMenu.value = selectedMenus[0] as string;
+  // showResource 显示资源管理弹窗
+  const showResource = async (id: string) => {
+    showResourceSetting.value = true;
+    roleId.value = id;
+    const { metadata: roleMenu } = await getMenuTreeByRole(id);
+    const { metadata: roleRouter } = await getRouterTreeByRole(id);
+    const { metadata: roleAct } = await getActionByRole(id);
+    resetRoleForm();
+    resetChecked();
+    buildCheckedRouters(roleRouter.roleRouters);
+    buildCheckedMenus(roleMenu.list);
+    buildCheckedActs(roleAct.list);
   };
-
-  const handleBeforeOk = async (done: any) => {
+  const onSelect = (rowKeys: string[]) => {
+    selectedRoles.value = rowKeys;
+  };
+  const handleRoleSubmit = async (done: any) => {
     const res = await formRef.value?.validate();
     if (!res) {
       try {
+        loading.value = true;
         if (isEdit.value) {
-          await updateRole(roleForm.value);
+          await updateRole(roleForm);
           Message.success(t('system.role.update.success'));
         } else {
-          await createRole(roleForm.value);
+          await createRole(roleForm);
           Message.success(t('system.role.create.success'));
         }
-        await fetchData(pagination);
+        await refresh();
         done();
       } catch (e) {
         done(false);
+      } finally {
+        loading.value = false;
       }
-    } else {
-      Message.error(t('system.form.validate.error'));
-      done(false);
     }
   };
 </script>

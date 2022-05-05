@@ -51,93 +51,82 @@
       :label="$t('userSetting.basicInfo.form.label.gender')"
     >
       <a-radio-group v-model="formData.gender" type="button">
-        <a-radio :value="0">{{
-          $t('userSetting.basicInfo.form.label.unknown')
-        }}</a-radio>
-        <a-radio :value="1">{{
-          $t('userSetting.basicInfo.form.label.male')
-        }}</a-radio>
-        <a-radio :value="2">{{
-          $t('userSetting.basicInfo.form.label.female')
-        }}</a-radio>
+        <a-radio :value="0"
+          >{{ $t('userSetting.basicInfo.form.label.unknown') }}
+        </a-radio>
+        <a-radio :value="1"
+          >{{ $t('userSetting.basicInfo.form.label.male') }}
+        </a-radio>
+        <a-radio :value="2"
+          >{{ $t('userSetting.basicInfo.form.label.female') }}
+        </a-radio>
       </a-radio-group>
     </a-form-item>
-    <!--    <a-form-item-->
-    <!--      field="countryRegion"-->
-    <!--      :label="$t('userSetting.basicInfo.form.label.countryRegion')"-->
-    <!--      :rules="[-->
-    <!--        {-->
-    <!--          required: true,-->
-    <!--          message: $t('userSetting.form.error.countryRegion.required'),-->
-    <!--        },-->
-    <!--      ]"-->
-    <!--    >-->
-    <!--      <a-select-->
-    <!--        v-model="formData.countryRegion"-->
-    <!--        :placeholder="$t('userSetting.basicInfo.placeholder.area')"-->
-    <!--      >-->
-    <!--        <a-option value="China">中国</a-option>-->
-    <!--      </a-select>-->
-    <!--    </a-form-item>-->
-    <!--    <a-form-item-->
-    <!--      field="area"-->
-    <!--      :label="$t('userSetting.basicInfo.form.label.area')"-->
-    <!--      :rules="[-->
-    <!--        {-->
-    <!--          required: true,-->
-    <!--          message: $t('userSetting.form.error.area.required'),-->
-    <!--        },-->
-    <!--      ]"-->
-    <!--    >-->
-    <!--      <a-cascader-->
-    <!--        v-model="formData.area"-->
-    <!--        :placeholder="$t('userSetting.basicInfo.placeholder.area')"-->
-    <!--        :options="[-->
-    <!--          {-->
-    <!--            label: '北京',-->
-    <!--            value: 'beijing',-->
-    <!--            children: [-->
-    <!--              {-->
-    <!--                label: '北京',-->
-    <!--                value: 'beijing',-->
-    <!--                children: [-->
-    <!--                  {-->
-    <!--                    label: '朝阳',-->
-    <!--                    value: 'chaoyang',-->
-    <!--                  },-->
-    <!--                ],-->
-    <!--              },-->
-    <!--            ],-->
-    <!--          },-->
-    <!--        ]"-->
-    <!--        allow-clear-->
-    <!--      />-->
-    <!--    </a-form-item>-->
-    <!--    <a-form-item-->
-    <!--      field="address"-->
-    <!--      :label="$t('userSetting.basicInfo.form.label.address')"-->
-    <!--    >-->
-    <!--      <a-input-->
-    <!--        v-model="formData.address"-->
-    <!--        :placeholder="$t('userSetting.basicInfo.placeholder.address')"-->
-    <!--      />-->
-    <!--    </a-form-item>-->
-    <!--    <a-form-item-->
-    <!--      field="profile"-->
-    <!--      :label="$t('userSetting.basicInfo.form.label.profile')"-->
-    <!--      :rules="[-->
-    <!--        {-->
-    <!--          maxLength: 200,-->
-    <!--          message: $t('userSetting.form.error.profile.maxLength'),-->
-    <!--        },-->
-    <!--      ]"-->
-    <!--      row-class="keep-margin"-->
-    <!--    >-->
-    <!--      <a-textarea-->
-    <!--        v-model="formData.profile"-->
-    <!--        :placeholder="$t('userSetting.basicInfo.placeholder.profile')"-->
-    <!--      />-->
-    <!--    </a-form-item>-->
+    <a-form-item
+      field="age"
+      :label="$t('userSetting.basicInfo.form.label.age')"
+    >
+      <a-input-number
+        v-model="formData.age"
+        :default-value="18"
+      ></a-input-number>
+    </a-form-item>
+    <a-form-item
+      field="birthday"
+      :label="$t('userSetting.basicInfo.form.label.birthday')"
+    >
+      <a-date-picker
+        v-model="formData.birthday"
+        :default-value="dayjs().format('YYYY-MM-DD')"
+      ></a-date-picker>
+    </a-form-item>
+    <a-form-item
+      field="country"
+      :label="$t('userSetting.basicInfo.form.label.countryRegion')"
+    >
+      <a-select
+        v-model="formData.country"
+        :placeholder="$t('userSetting.basicInfo.placeholder.area')"
+        :options="countryOptions"
+      >
+      </a-select>
+    </a-form-item>
+    <a-form-item
+      field="city"
+      :label="$t('userSetting.basicInfo.form.label.area')"
+    >
+      <a-select
+        v-model="formData.city"
+        :placeholder="$t('userSetting.basicInfo.placeholder.area')"
+        :options="cityOptions"
+        allow-clear
+      />
+    </a-form-item>
+    <a-form-item
+      field="address"
+      :label="$t('userSetting.basicInfo.form.label.address')"
+    >
+      <a-input
+        v-model="formData.address"
+        :placeholder="$t('userSetting.basicInfo.placeholder.address')"
+      />
+    </a-form-item>
+    <a-form-item
+      field="description"
+      :label="$t('userSetting.basicInfo.form.label.profile')"
+      :rules="[
+        {
+          maxLength: 200,
+          message: $t('userSetting.form.error.profile.maxLength'),
+        },
+      ]"
+      row-class="keep-margin"
+    >
+      <a-textarea
+        v-model="formData.description"
+        :placeholder="$t('userSetting.basicInfo.placeholder.profile')"
+      />
+    </a-form-item>
     <a-form-item>
       <a-space>
         <a-button
@@ -159,14 +148,15 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
   import { FormInstance } from '@arco-design/web-vue/es/form';
-  import { UserRequest } from '@/types/user';
+  import { UserRequest } from '@/api/model/user';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
-  import { LoginRequest } from '@/types/public';
+  import { LoginRequest } from '@/api/model/public';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import { Message } from '@arco-design/web-vue';
   import { useI18n } from 'vue-i18n';
   import { mobilePattern, emailPattern } from '@/types/global';
+  import dayjs from 'dayjs';
 
   const { t } = useI18n();
   const errorMessage = ref('');
@@ -177,14 +167,17 @@
     email: '',
     nickname: '',
     mobile: '',
+    address: '',
+    country: '',
+    city: '',
+    description: '',
+    birthday: '',
     gender: 0,
   });
+  const countryOptions = ['中国'];
+  const cityOptions = ['上海', '北京', '广州', '深圳', '武汉', '成都', '天津'];
   const validate = async () => {
-    const res = await formRef.value?.validate();
-    if (!res) {
-      // do some thing
-      // you also can use html-type to submit
-    }
+    await formRef.value?.validate();
   };
   const reset = async () => {
     await formRef.value?.resetFields();

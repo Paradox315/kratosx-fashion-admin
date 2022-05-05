@@ -53,7 +53,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1IDReply"
+              "$ref": "#/definitions/v1EmptyReply"
             }
           },
           "default": {
@@ -73,6 +73,28 @@
             }
           }
         ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/init/info": {
+      "get": {
+        "operationId": "User_InitUserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserState"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
         "tags": [
           "User"
         ]
@@ -110,14 +132,53 @@
         ]
       }
     },
+    "/log/list/{current}/{pageSize}": {
+      "get": {
+        "operationId": "User_ListUserLog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUserLogReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "current",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "pageSize",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
     "/password": {
       "put": {
+        "summary": "@Logger",
         "operationId": "User_UpdatePassword",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1IDReply"
+              "$ref": "#/definitions/v1EmptyReply"
             }
           },
           "default": {
@@ -142,14 +203,15 @@
         ]
       }
     },
-    "/status": {
+    "/reset-password/{id}": {
       "put": {
-        "operationId": "User_UpdateUserStatus",
+        "summary": "@Logger",
+        "operationId": "User_ResetPassword",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1IDReply"
+              "$ref": "#/definitions/v1EmptyReply"
             }
           },
           "default": {
@@ -161,12 +223,10 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "id",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1StatusRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
@@ -281,14 +341,15 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
     "v1ListSearchRequest": {
       "type": "object",
       "properties": {
-        "pageNum": {
+        "current": {
           "type": "integer",
           "format": "int64"
         },
@@ -301,6 +362,21 @@
           "items": {
             "$ref": "#/definitions/v1QueryOption"
           }
+        }
+      }
+    },
+    "v1ListUserLogReply": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserLog"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -323,13 +399,33 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "oldPassword": {
           "type": "string"
         },
         "newPassword": {
           "type": "string"
+        },
+        "confirmPassword": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Position": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "format": "float"
+        },
+        "lng": {
+          "type": "number",
+          "format": "float"
         }
       }
     },
@@ -358,15 +454,58 @@
         }
       }
     },
-    "v1StatusRequest": {
+    "v1UserLog": {
       "type": "object",
       "properties": {
         "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "path": {
           "type": "string"
         },
         "status": {
           "type": "integer",
           "format": "int64"
+        },
+        "country": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/definitions/v1Position"
+        },
+        "time": {
+          "type": "string"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "client": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        },
+        "device": {
+          "type": "string"
+        },
+        "deviceType": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
         }
       }
     },
@@ -374,7 +513,72 @@
       "type": "object",
       "properties": {
         "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "username": {
           "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "creator": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "birthday": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserRole"
+          }
+        }
+      }
+    },
+    "v1UserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
         },
         "username": {
           "type": "string"
@@ -391,60 +595,37 @@
         "nickname": {
           "type": "string"
         },
-        "gender": {
+        "address": {
           "type": "string"
         },
-        "status": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "createdAt": {
+        "country": {
           "type": "string"
         },
-        "updatedAt": {
+        "city": {
           "type": "string"
         },
-        "userRoles": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1UserRole"
-          }
-        }
-      }
-    },
-    "v1UserRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
+        "description": {
           "type": "string"
         },
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "avatar": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "mobile": {
+        "birthday": {
           "type": "string"
         },
         "gender": {
           "type": "integer",
           "format": "int64"
         },
-        "status": {
+        "age": {
           "type": "integer",
           "format": "int64"
         },
-        "userRoles": {
+        "status": {
+          "type": "boolean"
+        },
+        "roles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1UserRoleID"
+            "type": "string",
+            "format": "uint64"
           }
         }
       }
@@ -453,27 +634,73 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "uint64"
         },
         "name": {
-          "type": "string"
-        },
-        "description": {
           "type": "string"
         }
       }
     },
-    "v1UserRoleID": {
+    "v1UserState": {
       "type": "object",
       "properties": {
         "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "username": {
           "type": "string"
         },
-        "userId": {
+        "email": {
           "type": "string"
         },
-        "roleId": {
+        "mobile": {
           "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "creator": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "birthday": {
+          "type": "string"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "registerDate": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
         }
       }
     }

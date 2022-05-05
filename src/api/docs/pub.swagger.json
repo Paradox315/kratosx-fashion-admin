@@ -40,6 +40,7 @@
     },
     "/login": {
       "post": {
+        "summary": "@Logger",
         "operationId": "Pub_Login",
         "responses": {
           "200": {
@@ -71,8 +72,8 @@
       }
     },
     "/logout": {
-      "post": {
-        "summary": "@Auth",
+      "put": {
+        "summary": "@Auth\n@Logger",
         "operationId": "Pub_Logout",
         "responses": {
           "200": {
@@ -93,6 +94,39 @@
         ]
       }
     },
+    "/refresh-token": {
+      "post": {
+        "summary": "@Logger",
+        "operationId": "Pub_RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RefreshReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RefreshRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Pub"
+        ]
+      }
+    },
     "/register": {
       "post": {
         "operationId": "Pub_Register",
@@ -100,7 +134,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1RegisterReply"
+              "$ref": "#/definitions/v1EmptyReply"
             }
           },
           "default": {
@@ -238,13 +272,17 @@
     "v1LoginReply": {
       "type": "object",
       "properties": {
-        "token": {
-          "$ref": "#/definitions/v1Token"
-        },
-        "userId": {
+        "accessToken": {
           "type": "string"
         },
-        "username": {
+        "refreshToken": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "tokenType": {
           "type": "string"
         }
       }
@@ -266,13 +304,28 @@
         }
       }
     },
-    "v1RegisterReply": {
+    "v1RefreshReply": {
       "type": "object",
       "properties": {
-        "userId": {
+        "accessToken": {
           "type": "string"
         },
-        "username": {
+        "refreshToken": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "tokenType": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RefreshRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
           "type": "string"
         }
       }
@@ -310,21 +363,6 @@
           "type": "string"
         },
         "captchaId": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Token": {
-      "type": "object",
-      "properties": {
-        "accessToken": {
-          "type": "string"
-        },
-        "expiresAt": {
-          "type": "string",
-          "format": "int64"
-        },
-        "tokenType": {
           "type": "string"
         }
       }

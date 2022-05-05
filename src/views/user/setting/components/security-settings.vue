@@ -14,7 +14,7 @@
             </a-typography-paragraph>
           </div>
           <div class="operation">
-            <a-button @click="handleClick">
+            <a-button @click="showModal = true">
               {{ $t('userSetting.SecuritySettings.button.update') }}
             </a-button>
           </div>
@@ -58,15 +58,16 @@
     </a-list-item>
   </a-list>
   <a-modal
-    v-model:visible="visible"
+    v-model:visible="showModal"
     :title="$t('userSetting.SecuritySettings.modal.password')"
+    :ok-loading="loading"
     unmount-on-close
-    @before-ok="handleBeforeOk"
-    @cancel="handleCancel"
+    @ok="handlePassword"
+    @cancel="showModal = false"
   >
     <a-form ref="formRef" :model="passwordInfo">
       <a-form-item
-        field="old_password"
+        field="oldPassword"
         :label="$t('userSetting.SecuritySettings.form.oldPassword')"
         :rules="[
           { required: true, message: $t('login.form.password.errMsg') },
@@ -74,14 +75,14 @@
         ]"
         :validate-trigger="['change', 'blur']"
       >
-        <a-input-password v-model="passwordInfo.old_password" allow-clear>
+        <a-input-password v-model="passwordInfo.oldPassword" allow-clear>
           <template #prefix>
             <icon-lock />
           </template>
         </a-input-password>
       </a-form-item>
       <a-form-item
-        field="new_password"
+        field="newPassword"
         :label="$t('userSetting.SecuritySettings.form.newPassword')"
         :rules="[
           { required: true, message: $t('login.form.password.errMsg') },
@@ -90,7 +91,7 @@
         ]"
         :validate-trigger="['change', 'blur']"
       >
-        <a-input-password v-model="passwordInfo.new_password" allow-clear>
+        <a-input-password v-model="passwordInfo.newPassword" allow-clear>
           <template #prefix>
             <icon-lock />
           </template>
@@ -106,7 +107,7 @@
         ]"
         :validate-trigger="['change', 'blur']"
       >
-        <a-input-password v-model="passwordInfo.confirm_password" allow-clear>
+        <a-input-password v-model="passwordInfo.confirmPassword" allow-clear>
           <template #prefix>
             <icon-lock />
           </template>
@@ -123,24 +124,21 @@
   import { FormInstance } from '@arco-design/web-vue/es/form';
   import { Message } from '@arco-design/web-vue';
   import { updatePassword } from '@/api/user';
+  import { PasswordRequest } from '@/api/model/user';
+  import useLoading from '@/hooks/loading';
+  import { useToggle } from '@vueuse/core';
 
   const { t } = useI18n();
   const userStore = useUserStore();
-  const visible = ref(false);
+  const [showModal] = useToggle();
+  const { loading, setLoading } = useLoading();
   const formRef = ref<FormInstance>();
-  const passwordInfo = reactive({
+  const passwordInfo = reactive<PasswordRequest>({
     id: userStore.id,
-    old_password: '',
-    new_password: '',
-    confirm_password: '',
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
-  const handleClick = () => {
-    visible.value = true;
-  };
-  const handleCancel = () => {
-    visible.value = false;
-  };
-
   const validateConfirmCheck = (
     value: any,
     callback: (error?: string) => void
@@ -149,7 +147,7 @@
       callback();
       return;
     }
-    if (value !== passwordInfo.new_password) {
+    if (value !== passwordInfo.newPassword) {
       callback(t('userSetting.SecuritySettings.form.match.errMsg'));
       return;
     }
@@ -161,22 +159,27 @@
       callback();
       return;
     }
-    if (value === passwordInfo.old_password) {
+    if (value === passwordInfo.oldPassword) {
       callback(t('userSetting.SecuritySettings.form.newPassword.match.errMsg'));
       return;
     }
     callback();
   };
-  const handleBeforeOk = async (done: any) => {
-    const res = await formRef.value?.validate();
-    if (!res) {
-      await updatePassword(passwordInfo);
-      Message.success(t('userSetting.SecuritySettings.form.submit.success'));
-      done();
-    } else {
-      Message.error(t('userSetting.SecuritySettings.form.submit.error'));
-      done();
-    }
+  const handlePassword = () => {
+    formRef.value?.validate(async (errors: any) => {
+      if (!errors) {
+        setLoading(true);
+        try {
+          await updatePassword(passwordInfo);
+          Message.success(t('userSetting.SecuritySettings.form.success'));
+          showModal.value = false;
+        } catch (error) {
+          Message.error(t('userSetting.SecuritySettings.form.fail'));
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
   };
 </script>
 

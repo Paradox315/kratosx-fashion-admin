@@ -9,20 +9,8 @@
  * ---------------------------------------------------------------
  */
 
-export interface ProtobufAny {
-  '@type'?: string;
-}
-
-export interface RpcStatus {
-  /** @format int32 */
-  code?: number;
-  message?: string;
-  details?: ProtobufAny[];
-}
-
-export type EmptyReply = object;
-
 export interface IDReply {
+  /** @format uint64 */
   id?: string;
 }
 
@@ -34,28 +22,28 @@ export interface ListRoleReply {
 }
 
 export interface RoleReply {
+  /** @format uint64 */
   id?: string;
   name?: string;
   description?: string;
-  created_at?: string;
-  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface RoleRequest {
-  id?: string;
+  /** @format uint64 */
+  id?: string | number;
   name?: string;
   description?: string;
-  role_resources?: RoleResource[];
-  role_routers?: Router[];
+  resources?: RoleResource[];
+  routers?: Router[];
 }
 
 export interface RoleResource {
-  id?: string;
-  role_id?: string;
-  resource_id?: string;
+  resourceId?: string;
 
   /** @format int64 */
-  resource_type?: number;
+  resourceType?: number;
 }
 
 export interface Router {

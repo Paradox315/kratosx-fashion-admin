@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* tslint:disable */
-
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -15,30 +14,25 @@ export interface QueryOptionInterval {
   to?: string;
 }
 
-export interface ProtobufAny {
-  '@type'?: string;
-}
-
-export interface RpcStatus {
-  /** @format int32 */
-  code?: number;
-  message?: string;
-  details?: ProtobufAny[];
-}
-
-export type EmptyReply = object;
-
 export interface IDReply {
+  /** @format uint64 */
   id?: string;
 }
 
 export interface ListSearchRequest {
   /** @format int64 */
-  page_num: number;
+  current: number;
 
   /** @format int64 */
-  page_size: number;
+  pageSize: number;
   query?: QueryOption[];
+}
+
+export interface ListUserLogReply {
+  list?: UserLog[];
+
+  /** @format int64 */
+  total?: number;
 }
 
 export interface ListUserReply {
@@ -49,10 +43,20 @@ export interface ListUserReply {
 }
 
 export interface PasswordRequest {
-  id?: string;
-  old_password?: string;
-  new_password?: string;
-  confirm_password?: string;
+  /** @format uint64 */
+  id?: string | number;
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+  refreshToken?: string;
+}
+
+export interface Position {
+  /** @format float */
+  lat?: number;
+
+  /** @format float */
+  lng?: number;
 }
 
 export interface QueryOption {
@@ -67,73 +71,100 @@ export interface QueryOption {
   time?: boolean;
 }
 
-export interface StatusRequest {
-  id?: string;
-
-  /** @format int64 */
-  status?: number;
-}
-
-export interface UserReply {
-  id?: string;
-  username?: string;
-  avatar?: string;
-  email?: string;
-  mobile?: string;
-  nickname?: string;
-  gender?: string;
-
-  /** @format int64 */
-  status?: number;
-  creator?: string;
-  created_at?: string;
-  updated_at?: string;
-  roles?: UserRole[];
-}
-
-export interface UserRequest {
-  id?: string;
-  username?: string;
-  password?: string;
-  avatar?: string;
-  email?: string;
-  mobile?: string;
-  nickname?: string;
-
-  /** @format int64 */
-  gender?: number;
-
-  /** @format int64 */
-  status?: number;
-  roles?: string[];
-}
-
-export interface UserRole {
-  id?: string;
-  name?: string;
-}
-
-export interface Position {
-  lat?: number;
-  lng?: number;
-}
-
-export interface LoginLogReply {
+export interface UserLog {
+  /** @format uint64 */
   id?: string;
   ip?: string;
+  method?: string;
+  path?: string;
+
+  /** @format int64 */
+  status?: number;
   country?: string;
   region?: string;
   city?: string;
   position?: Position;
   time?: string;
-  agent?: string;
+  userAgent?: string;
+  client?: string;
   os?: string;
   device?: string;
-  device_type?: number;
-  login_type?: number;
+  deviceType?: string;
+  Type?: string;
 }
 
-export interface ListLoginLogReply {
-  list?: LoginLogReply[];
-  total?: number;
+export interface UserReply {
+  /** @format uint64 */
+  id?: string;
+  username?: string;
+  email?: string;
+  mobile?: string;
+  avatar?: string;
+  nickname?: string;
+  gender?: string;
+  creator?: string;
+  address?: string;
+  country?: string;
+  city?: string;
+  description?: string;
+  status?: boolean;
+  birthday?: string;
+
+  /** @format int64 */
+  age?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  roles?: UserRole[];
+}
+
+export interface UserRequest {
+  /** @format uint64 */
+  id?: string | number;
+  username?: string;
+  avatar?: string;
+  email?: string;
+  mobile?: string;
+  nickname?: string;
+  address?: string;
+  country?: string;
+  city?: string;
+  description?: string;
+  birthday?: string;
+
+  /** @format int64 */
+  gender?: number;
+
+  /** @format int64 */
+  age?: number;
+  status?: boolean;
+  roles?: string[];
+}
+
+export interface UserRole {
+  /** @format uint64 */
+  id?: string | number;
+  name?: string;
+}
+
+export interface UserState {
+  /** @format uint64 */
+  id?: string | number;
+  username?: string;
+  email?: string;
+  mobile?: string;
+  avatar?: string;
+  nickname?: string;
+  gender?: string;
+  creator?: string;
+  address?: string;
+  country?: string;
+  city?: string;
+  description?: string;
+  status?: boolean;
+  birthday?: string;
+
+  /** @format int64 */
+  age?: number;
+  registerDate?: string;
+  roles?: string[];
 }

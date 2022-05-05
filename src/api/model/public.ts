@@ -10,55 +10,54 @@
  */
 
 export interface CaptchaReply {
-  captcha_id: string;
-  pic_path: string;
+  captchaId: string;
+  picPath: string;
 }
 
-export type EmptyReply = object;
-
-export type EmptyRequest = object;
-
 export interface LoginReply {
-  token?: Token;
-  user_id?: string;
-  username?: string;
+  accessToken: string;
+  refreshToken: string;
+
+  /** @format int64 */
+  expiresAt: string;
+  tokenType: string;
 }
 
 export interface LoginRequest {
-  username?: string;
-  password?: string;
-  captcha?: string;
-  captcha_id?: string;
+  username: string;
+  password: string;
+  captcha: string;
+  captchaId: string;
 }
 
-export interface RegisterReply {
-  user_id?: string;
-  username?: string;
+export interface RefreshReply {
+  accessToken: string;
+  refreshToken: string;
+
+  /** @format int64 */
+  expiresAt: string;
+  tokenType: string;
+}
+
+export interface RefreshRequest {
+  refreshToken?: string;
 }
 
 export interface RegisterRequest {
-  username?: string;
-  password?: string;
+  username: string;
+  password: string;
   email?: string;
   mobile?: string;
   captcha?: string;
-  captcha_id?: string;
+  captchaId?: string;
 }
 
 export interface RetrieveRequest {
   username?: string;
   captcha?: string;
-  captcha_id?: string;
-}
-
-export interface Token {
-  access_token?: string;
-
-  /** @format int64 */
-  expires_at?: string;
-  token_type?: string;
+  captchaId?: string;
 }
 
 export interface UploadReply {
-  url?: string;
+  url: string;
 }

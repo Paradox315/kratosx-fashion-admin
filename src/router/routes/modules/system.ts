@@ -1,6 +1,6 @@
 export default {
   path: 'system',
-  name: 'system',
+  name: 'System',
   component: () => import('@/views/system/index.vue'),
   meta: {
     locale: 'menu.system',

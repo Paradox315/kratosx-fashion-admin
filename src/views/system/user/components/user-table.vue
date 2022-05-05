@@ -92,7 +92,7 @@
         <a-button
           type="text"
           status="danger"
-          :disabled="!showDelete"
+          :disabled="disableDeleteBtn"
           @click="delUsers"
         >
           <template #icon>
@@ -103,7 +103,7 @@
       </a-space>
     </a-col>
     <a-col :span="8" style="text-align: right">
-      <a-button @click="openSetting">
+      <a-button @click="setSetting(true)">
         <template #icon>
           <icon-settings />
         </template>
@@ -122,9 +122,15 @@
     :column-resizable="setting.columnResizable"
     :row-selection="setting.checkbox ? rowSelection : undefined"
     :loading="loading"
-    :data="renderData"
-    :pagination="pagination"
-    @page-change="onPageChange"
+    :data="users"
+    :pagination="{
+      pageSize: pageSize,
+      total: total,
+      current: userCurrent,
+      showPageSize: true,
+    }"
+    @page-change="changeUserCurrent"
+    @page-size-change="changePageSize"
     @select="onSelect"
   >
     <template #avatar="{ record }">
@@ -133,12 +139,12 @@
       </a-avatar>
     </template>
     <template #status="{ record }">
-      <span v-if="record.status === 2" class="circle"></span>
-      <span v-else-if="record.status === 1" class="circle pass"></span>
+      <span v-if="record.status" class="circle"></span>
+      <span v-else class="circle pass"></span>
       {{
-        record.status === 2
-          ? $t('system.table.status.disabled')
-          : $t('system.table.status.enabled')
+        record.status
+          ? $t('system.table.status.enabled')
+          : $t('system.table.status.disabled')
       }}
     </template>
     <template #roles="{ record }">
@@ -163,35 +169,13 @@
     </template>
   </a-table>
   <a-modal
-    v-model:visible="visible"
+    v-model:visible="showModal"
     :width="600"
     unmount-on-close
-    @before-ok="handleBeforeOk"
-    @cancel="handleCancel"
+    @before-ok="handleUserSubmit"
+    @cancel="showModal = false"
   >
-    <template #title>{{ $t('system.user.description') }}</template>
-    <a-descriptions
-      v-if="modalType === 0"
-      :data="userDesc"
-      :title="$t('system.user.title')"
-      :column="{ xs: 1, md: 3, lg: 4 }"
-    >
-      <a-descriptions-item
-        v-for="item of userDesc"
-        :key="item.label"
-        :label="item.label"
-      >
-        <a-space v-if="item.label === $t('system.user.roles')">
-          <a-tag v-for="role in item.value" :key="role.id">
-            {{ role.name }}
-          </a-tag>
-        </a-space>
-        <span v-else>
-          {{ item.value }}
-        </span>
-      </a-descriptions-item>
-    </a-descriptions>
-    <a-form v-else ref="formRef" :model="userForm">
+    <a-form ref="formRef" :model="userForm">
       <a-form-item
         field="username"
         :label="$t('system.user.username')"
@@ -210,24 +194,6 @@
           v-model="userForm.username"
           :placeholder="$t('system.user.form.username.placeholder')"
         />
-      </a-form-item>
-      <a-form-item
-        v-if="modalType === 2"
-        field="password"
-        :label="$t('system.user.password')"
-        :rules="[
-          {
-            required: true,
-            message: $t('system.user.form.password.required'),
-          },
-        ]"
-      >
-        <a-input-password
-          v-model="userForm.password"
-          :placeholder="$t('system.user.form.password.placeholder')"
-          allow-clear
-        >
-        </a-input-password>
       </a-form-item>
       <a-form-item field="nickname" :label="$t('system.user.nickname')">
         <a-input
@@ -287,11 +253,7 @@
         </a-radio-group>
       </a-form-item>
       <a-form-item field="status" :label="$t('system.user.status')">
-        <a-switch
-          v-model="userForm.status"
-          :checked-value="1"
-          :unchecked-value="2"
-        />
+        <a-switch v-model="userForm.status" />
       </a-form-item>
       <a-form-item
         field="roles"
@@ -306,9 +268,9 @@
           :field-names="{ value: 'id', label: 'name' }"
           :placeholder="$t('system.user.form.roles.placeholder')"
           multiple
-          @dropdown-reach-bottom="loadMoreRoles"
+          @dropdown-reach-bottom="loadMoreRole"
         >
-          <a-option v-for="role in roleList" :key="role.id" :value="role.id">
+          <a-option v-for="role in roles" :key="role.id" :value="role.id">
             {{ role.name }}
           </a-option>
         </a-select>
@@ -349,96 +311,23 @@
       </a-form-item>
     </a-form>
   </a-modal>
-  <a-drawer
-    :visible="showSetting"
-    :width="500"
-    :footer="false"
-    unmount-on-close
-    @ok="saveSetting"
-    @cancel="cancelSetting"
-  >
-    <template #title> {{ $t('system.table.setting') }} </template>
-    <a-form>
-      <a-form-item :label="$t('system.table.setting.border')" field="border">
-        <a-switch v-model="setting.border" />
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.hover')" field="hover">
-        <a-switch v-model="setting.hover" />
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.stripe')" field="stripe">
-        <a-switch v-model="setting.stripe" />
-      </a-form-item>
-      <a-form-item
-        :label="$t('system.table.setting.checkbox')"
-        field="checkbox"
-      >
-        <a-switch v-model="setting.checkbox" @change="checkboxChange" />
-      </a-form-item>
-      <a-form-item
-        :label="$t('system.table.setting.resizeColumn')"
-        field="columnResizable"
-      >
-        <a-switch v-model="setting.columnResizable" />
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.size')" field="size">
-        <a-radio-group v-model="setting.size" type="button">
-          <a-radio value="mini">
-            {{ $t('system.table.setting.size.mini') }}
-          </a-radio>
-          <a-radio value="small">
-            {{ $t('system.table.setting.size.small') }}
-          </a-radio>
-          <a-radio value="medium">
-            {{ $t('system.table.setting.size.medium') }}
-          </a-radio>
-          <a-radio value="large">
-            {{ $t('system.table.setting.size.large') }}
-          </a-radio>
-        </a-radio-group>
-      </a-form-item>
-      <a-form-item :label="$t('system.table.setting.scroll')" field="scroll">
-        <a-space direction="vertical">
-          <a-input-number
-            v-model="setting.scroll.x"
-            :style="{ width: '320px' }"
-            :default-value="setting.scroll.x"
-            :step="100"
-            mode="button"
-            class="input-demo"
-          />
-          <a-input-number
-            v-model="setting.scroll.y"
-            :style="{ width: '320px' }"
-            :default-value="setting.scroll.y"
-            :step="100"
-            mode="button"
-            class="input-demo"
-          />
-        </a-space>
-      </a-form-item>
-    </a-form>
-  </a-drawer>
+  <TableSetting
+    v-model:setting="setting"
+    v-model:visible="showSetting"
+    @check-box-change="setDeleteBatch"
+  ></TableSetting>
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
+  import { computed, h, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import {
-    Pagination,
     emailPattern,
     mobilePattern,
     usernamePattern,
     Options,
   } from '@/types/global';
-  import { RoleReply } from '@/types/role';
-  import {
-    ListSearchRequest,
-    QueryOption,
-    UserReply,
-    UserRequest,
-    UserRole,
-  } from '@/types/user';
-  import useLoading from '@/hooks/loading';
+  import { QueryOption, UserReply, UserRequest } from '@/api/model/user';
   import { createUser, deleteUser, getUserList, updateUser } from '@/api/user';
   import { getRoleList } from '@/api/role';
   import {
@@ -447,15 +336,51 @@
   } from '@arco-design/web-vue/es/upload/interfaces';
   import { uploadFile } from '@/api/public';
   import { FormInstance } from '@arco-design/web-vue/es/form';
-  import { Message, Modal } from '@arco-design/web-vue';
+  import { DescData, Descriptions, Message, Modal } from '@arco-design/web-vue';
   import dayjs from 'dayjs';
+  import useTableSetting from '@/components/table-setting/table-setting';
+  import TableSetting from '@/components/table-setting/index.vue';
+  import useDeleteBatch from '@/hooks/delete-batch';
+  import { usePagination } from 'vue-request';
 
   const { t } = useI18n();
-  const { loading, setLoading } = useLoading(true);
+  const { setting, showSetting, setSetting } = useTableSetting();
+  const { deleteBatch, setDeleteBatch, resetDeleteBatch } = useDeleteBatch();
+  const {
+    data: userData,
+    current: userCurrent,
+    pageSize,
+    loading,
+    total,
+    changeCurrent: changeUserCurrent,
+    changePageSize,
+    refresh,
+    run: searchUser,
+  } = usePagination(getUserList, {
+    pagination: {
+      totalKey: 'metadata.total',
+    },
+  });
+  const {
+    data: roleData,
+    current: roleCurrent,
+    changeCurrent: changeRoleCurrent,
+    totalPage,
+  } = usePagination(getRoleList, {
+    pagination: {
+      totalKey: 'metadata.total',
+    },
+  });
+  const loadMoreRole = async () => {
+    if (roleCurrent < totalPage) {
+      await changeRoleCurrent(roleCurrent.value + 1);
+    }
+  };
+  const roles = computed(() => roleData.value?.metadata.list || []);
+  const users = computed(() => userData.value?.metadata.list || []);
+  const userForm = reactive<UserRequest>({});
   const fileList = ref<FileItem[]>();
   const formRef = ref<FormInstance>();
-  const renderData = ref<UserReply[] | undefined>([]);
-  const userForm = ref<UserRequest>({});
   const queryForm = ref({
     username: '',
     email: '',
@@ -464,72 +389,9 @@
     gender: '',
     timeSpan: [],
   });
-  const userDesc = ref([
-    {
-      label: t('system.user.username'),
-      value: '',
-    },
-    {
-      label: t('system.user.nickname'),
-      value: '',
-    },
-    {
-      label: t('system.user.email'),
-      value: '',
-    },
-    {
-      label: t('system.user.mobile'),
-      value: '',
-    },
-    {
-      label: t('system.user.status'),
-      value: '',
-    },
-    {
-      label: t('system.user.createUser'),
-      value: '',
-    },
-    {
-      label: t('system.user.createTime'),
-      value: '',
-    },
-    {
-      label: t('system.user.updateTime'),
-      value: '',
-    },
-    {
-      label: t('system.user.roles'),
-      value: Array<UserRole>(0),
-    },
-  ]);
-  const visible = ref(false);
-  const showSetting = ref(false);
-  const showDelete = ref(false);
-  const modalType = ref(0);
-  const roleList = ref<RoleReply[] | undefined>([]);
+  const showModal = ref(false);
+  const isEdit = ref(false);
   const selectedUsers = ref<string[]>([]);
-  const basePagination: Pagination = {
-    current: 1,
-    pageSize: 10,
-  };
-  const pagination = reactive({
-    ...basePagination,
-  });
-  const rolePagination = reactive({
-    ...basePagination,
-  });
-  const setting = reactive({
-    border: false,
-    hover: true,
-    stripe: false,
-    checkbox: false,
-    columnResizable: true,
-    size: 'medium',
-    scroll: {
-      x: 1600,
-      y: 1000,
-    },
-  });
   const columns = [
     {
       title: t('system.user.id'),
@@ -579,11 +441,11 @@
     },
     {
       title: t('system.user.createTime'),
-      dataIndex: 'created_at',
+      dataIndex: 'createdAt',
     },
     {
       title: t('system.user.updateTime'),
-      dataIndex: 'updated_at',
+      dataIndex: 'updatedAt',
     },
     {
       title: t('system.table.actions'),
@@ -620,59 +482,9 @@
       value: '2',
     },
   ]);
-  const fetchData = async (
-    params: ListSearchRequest = { page_num: 1, page_size: 10 }
-  ) => {
-    setLoading(true);
-    try {
-      const res = await getUserList(params);
-      renderData.value = res.metadata.list;
-      pagination.total = res.metadata.total;
-    } catch (err) {
-      // you can report use errorHandler or other
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchRole = async (
-    params: Pagination = { current: 1, pageSize: 10 }
-  ) => {
-    setLoading(true);
-    try {
-      const res = await getRoleList(params);
-      roleList.value = res.metadata.list;
-      rolePagination.current = params.current;
-      rolePagination.total = res.metadata.total;
-    } catch (err) {
-      // you can report use errorHandler or other
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-  fetchRole();
-  // eslint-disable-next-line camelcase
-  const onPageChange = (current: number) => {
-    pagination.current = current;
-    fetchData({ page_num: pagination.current, page_size: pagination.pageSize });
-  };
-  const loadMoreRoles = () => {
-    rolePagination.total = rolePagination.total as number;
-    if (
-      rolePagination.current * rolePagination.pageSize >=
-      rolePagination.total
-    ) {
-      return;
-    }
-    rolePagination.current += 1;
-    fetchRole(rolePagination);
-  };
 
   const viewInfo = (record: UserReply) => {
-    visible.value = true;
-    modalType.value = 0;
-    userDesc.value = [
+    const userDesc: DescData[] = [
       {
         label: t('system.user.username'),
         value: record.username as string,
@@ -691,13 +503,9 @@
       },
       {
         label: t('system.user.status'),
-        value:
-          // eslint-disable-next-line no-nested-ternary
-          record.status === 1
-            ? t('system.user.status.normal')
-            : record.status === 2
-            ? t('system.user.status.disabled')
-            : t('system.user.status.unknown'),
+        value: record.status
+          ? t('system.user.status.normal')
+          : t('system.user.status.disabled'),
       },
       {
         label: t('system.user.createUser'),
@@ -705,17 +513,27 @@
       },
       {
         label: t('system.user.createTime'),
-        value: record.created_at as string,
+        value: record.createdAt as string,
       },
       {
         label: t('system.user.updateTime'),
-        value: record.updated_at as string,
+        value: record.updatedAt as string,
       },
       {
         label: t('system.user.roles'),
-        value: record.roles ? record.roles : Array<UserRole>(0),
+        value: record.roles?.join(',') as string,
       },
     ];
+    Modal.open({
+      title: t('system.user.title'),
+      content: () => {
+        return h(Descriptions, {
+          data: userDesc,
+          title: t('system.user.title'),
+          column: 1,
+        });
+      },
+    });
   };
   const uploadChange = (fileItemList: FileItem[], fileItem: FileItem) => {
     fileList.value = [fileItem];
@@ -734,27 +552,24 @@
     };
     try {
       const res = await uploadFile(formData, onUploadProgress);
-      userForm.value.avatar = res.metadata.url;
+      userForm.avatar = res.metadata.url;
       onSuccess(res);
     } catch (error) {
       onError(error);
     }
   };
   const saveUser = () => {
-    visible.value = true;
-    modalType.value = 2;
-    userForm.value = {
-      id: '',
-      username: '',
-      password: '123456',
-      nickname: '',
-      email: '',
-      mobile: '',
-      status: 1,
-      gender: 0,
-      roles: [],
-      avatar: 'http://dummyimage.com/100x100',
-    };
+    showModal.value = true;
+    isEdit.value = false;
+    userForm.id = 0;
+    userForm.username = '';
+    userForm.nickname = '';
+    userForm.email = '';
+    userForm.mobile = '';
+    userForm.status = true;
+    userForm.roles = [];
+    userForm.gender = 0;
+    userForm.avatar = 'http://dummyimage.com/100x100';
     const file = {
       uid: '',
       name: 'avatar.png',
@@ -762,21 +577,29 @@
     };
     fileList.value = [file];
   };
+  const onSelect = (rowKeys: string[]) => {
+    selectedUsers.value = rowKeys;
+  };
+  const disableDeleteBtn = computed(() => {
+    return selectedUsers.value.length === 0 || !deleteBatch.value;
+  });
   const editInfo = (record: UserReply) => {
-    visible.value = true;
-    modalType.value = 1;
-    userForm.value = {
-      id: record.id,
-      username: record.username,
-      nickname: record.nickname,
-      email: record.email,
-      mobile: record.mobile,
-      status: record.status,
+    showModal.value = true;
+    isEdit.value = true;
+
+    userForm.id = record.id;
+    userForm.username = record.username;
+    userForm.nickname = record.nickname;
+    userForm.email = record.email;
+    userForm.mobile = record.mobile;
+    userForm.status = record.status;
+    userForm.gender =
       // eslint-disable-next-line no-nested-ternary
-      gender: record.gender === '男' ? 1 : record.gender === '女' ? 2 : 0,
-      roles: record.roles ? (record.roles.map((item) => item.id) as any) : [],
-      avatar: record.avatar,
-    };
+      record.gender === '男' ? 1 : record.gender === '女' ? 2 : 0;
+    userForm.roles = record.roles
+      ? (record.roles.map((item) => item.id) as any)
+      : [];
+    userForm.avatar = record.avatar;
     const file = {
       uid: '',
       name: 'avatar.png',
@@ -789,16 +612,10 @@
       title: t('system.modal.user.delete.title'),
       content: t('system.modal.user.delete.content'),
       onOk: async () => {
-        try {
-          await deleteUser(id);
-          Message.success(t('system.user.delUserSuccess'));
-          await fetchData({
-            page_num: pagination.current,
-            page_size: pagination.pageSize,
-          });
-        } catch (error) {
-          Message.error(t('system.user.delUserFailed'));
-        }
+        await deleteUser(id);
+        Message.success(t('system.user.delUserSuccess'));
+        resetDeleteBatch();
+        refresh();
       },
     });
   };
@@ -807,50 +624,34 @@
       title: t('system.modal.user.delete.title'),
       content: t('system.modal.user.delete.content'),
       onOk: async () => {
-        try {
-          await deleteUser(selectedUsers.value.join(','));
-          Message.success(t('system.user.delUserSuccess'));
-          await fetchData({
-            page_num: pagination.current,
-            page_size: pagination.pageSize,
-          });
-          showDelete.value = false;
-        } catch (error) {
-          Message.error(t('system.user.delUserFailed'));
-        }
+        await deleteUser(selectedUsers.value.join(','));
+        Message.success(t('system.user.delUserSuccess'));
+        selectedUsers.value = [];
+        resetDeleteBatch();
+        refresh();
       },
     });
   };
-  const handleBeforeOk = async (done: any) => {
-    if (modalType.value === 0) {
-      done();
-      return;
-    }
+  const handleUserSubmit = async (done: any) => {
     const res = await formRef.value?.validate();
     if (!res) {
       try {
-        if (modalType.value === 1) {
-          await updateUser(userForm.value);
+        loading.value = true;
+        if (isEdit.value) {
+          await updateUser(userForm);
           Message.success(t('system.user.form.update'));
-        } else if (modalType.value === 2) {
-          await createUser(userForm.value);
+        } else {
+          await createUser(userForm);
           Message.success(t('system.user.form.create'));
         }
+        await refresh();
         done();
-        await fetchData({
-          page_num: pagination.current,
-          page_size: pagination.pageSize,
-        });
       } catch (err) {
         done(false);
+      } finally {
+        loading.value = false;
       }
-    } else {
-      done(false);
-      Message.error(t('system.form.validate.error'));
     }
-  };
-  const handleCancel = () => {
-    visible.value = false;
   };
   const buildQuery = () => {
     const queryOpts: Array<QueryOption> = [];
@@ -906,9 +707,9 @@
   };
   const search = () => {
     const queryOptions = buildQuery();
-    fetchData({
-      page_num: pagination.current,
-      page_size: pagination.pageSize,
+    searchUser({
+      current: userCurrent.value,
+      pageSize: pageSize.value,
       query: queryOptions,
     });
   };
@@ -921,22 +722,6 @@
       gender: '',
       timeSpan: [],
     };
-  };
-  const openSetting = () => {
-    showSetting.value = true;
-  };
-  const saveSetting = () => {
-    showSetting.value = false;
-  };
-  const cancelSetting = () => {
-    showSetting.value = false;
-  };
-  const onSelect = (rowKeys: string[]) => {
-    showDelete.value = true;
-    selectedUsers.value = rowKeys;
-  };
-  const checkboxChange = () => {
-    showDelete.value = setting.checkbox && selectedUsers.value.length > 0;
   };
 </script>
 

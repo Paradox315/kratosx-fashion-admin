@@ -2,55 +2,53 @@ import axios from 'axios';
 import { HttpResponse } from '@/types/response';
 import {
   IDReply,
-  ListLoginLogReply,
   ListSearchRequest,
+  ListUserLogReply,
   ListUserReply,
   PasswordRequest,
-  StatusRequest,
   UserReply,
   UserRequest,
-} from '@/types/user';
-import { UserState } from '@/store/modules/user/types';
+  UserState,
+} from '@/api/model/user';
+import { Pagination } from '@/types/global';
+import service from '@/utils/service';
 
 const prefix = '/api/system/v1/user';
 
 export function getUserInfo(id: string) {
-  return axios.get<UserReply, HttpResponse<UserReply>>(`${prefix}/${id}`);
+  return service.get<UserReply>(`${prefix}/${id}`);
 }
 
 export function initUserInfo() {
-  return axios.get<UserState, HttpResponse<UserState>>(`${prefix}/init/info`);
+  return service.get<UserState>(`${prefix}/init/info`);
 }
 
 export function getUserList(params: ListSearchRequest) {
-  return axios.post<ListUserReply, HttpResponse<ListUserReply>>(
-    `${prefix}/list`,
-    params
-  );
+  return service.post<ListUserReply>(`${prefix}/list`, params);
 }
 
 export function createUser(data: UserRequest) {
-  return axios.post<IDReply, HttpResponse<IDReply>>(`${prefix}/`, data);
+  return service.post<IDReply>(`${prefix}/`, data);
 }
 
 export function updateUser(data: UserRequest) {
-  return axios.put<IDReply, HttpResponse<IDReply>>(`${prefix}/`, data);
+  return service.put(`${prefix}/`, data);
 }
 
 export function deleteUser(ids: string) {
-  return axios.delete<IDReply, HttpResponse<IDReply>>(`${prefix}/${ids}`);
+  return service.delete(`${prefix}/${ids}`);
 }
 
 export function updatePassword(data: PasswordRequest) {
-  return axios.put<IDReply, HttpResponse<IDReply>>(`${prefix}/password`, data);
+  return service.put(`${prefix}/password`, data);
 }
 
-export function updateStatus(params: StatusRequest) {
-  return axios.put<object, HttpResponse<object>>(`${prefix}/status`, params);
+export function resetPassword(id: string) {
+  return service.put(`${prefix}/reset-password/${id}`);
 }
 
-export function getLogList(pageNum: number, pageSize: number) {
-  return axios.get<ListLoginLogReply, HttpResponse<ListLoginLogReply>>(
-    `${prefix}/log/list/${pageNum}/${pageSize}`
+export function getLogList(params: Pagination) {
+  return service.get<ListUserLogReply>(
+    `${prefix}/log/list/${params.current}/${params.pageSize}`
   );
 }

@@ -2,7 +2,7 @@
   <a-select
     :options="icons"
     :placeholder="$t('iconPicker.placeholder')"
-    allow-search
+    unmount-on-close
   >
   </a-select>
 </template>
@@ -42,9 +42,10 @@
   } from '@arco-design/web-vue/es/icon';
   import { h } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { SelectOptionValue } from '@arco-design/web-vue/es/select/interface';
 
   const { t } = useI18n();
-  const icons: SelectOptionData = [
+  const icons = [
     {
       value: 'icon-apps',
       label: t('icon.apps'),

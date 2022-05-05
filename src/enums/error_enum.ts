@@ -1,0 +1,2 @@
+export const JWT_AUTH_ERROR = 'JWT_AUTH_ERROR';
+export const CASBIN_RBAC_ERROR = 'CASBIN_RBAC_ERROR';
