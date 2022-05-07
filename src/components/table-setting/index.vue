@@ -77,7 +77,6 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
   import { useVModel } from '@vueuse/core';
 
   const props = defineProps<{

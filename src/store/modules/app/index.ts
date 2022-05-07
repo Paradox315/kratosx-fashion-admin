@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
-import defaultSettings from '@/config/settings.json';
+import { getSetting } from '@/utils/setting';
 import { AppState } from './types';
 
 const useAppStore = defineStore('app', {
-  state: (): AppState => ({ ...defaultSettings }),
+  state: (): AppState => ({ ...getSetting() }),
 
   getters: {
     appCurrentSetting(state: AppState): AppState {
@@ -37,6 +37,9 @@ const useAppStore = defineStore('app', {
     toggleMenu(value: boolean) {
       this.hideMenu = value;
     },
+  },
+  persist: {
+    enabled: true,
   },
 });
 

@@ -7,7 +7,7 @@ import Login from './routes/modules/login';
 import appRoutes from './routes';
 import createRouteGuard from './guard';
 
-NProgress.configure({ showSpinner: false }); // NProgress Configuration
+NProgress.configure({ showSpinner: true }); // NProgress Configuration
 
 const router = createRouter({
   history: createWebHistory(),
@@ -22,11 +22,6 @@ const router = createRouter({
       path: '/',
       component: DefaultLayout,
       children: appRoutes,
-    },
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'notFound',
-      component: () => import('@/views/not-found/index.vue'),
     },
   ],
   scrollBehavior() {

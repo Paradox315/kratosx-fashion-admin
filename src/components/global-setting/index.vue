@@ -11,14 +11,13 @@
     unmount-on-close
     :visible="visible"
     :cancel-text="$t('settings.close')"
-    :ok-text="$t('settings.copySettings')"
-    @ok="copySettings"
+    :ok-text="$t('settings.saveSetting')"
+    @ok="saveSettings"
     @cancel="cancel"
   >
     <template #title> {{ $t('settings.title') }} </template>
     <Block :options="contentOpts" :title="$t('settings.content')" />
     <Block :options="othersOpts" :title="$t('settings.otherSettings')" />
-    <a-alert>{{ $t('settings.alertContent') }}</a-alert>
   </a-drawer>
 </template>
 
@@ -26,7 +25,6 @@
   import { computed } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import { useI18n } from 'vue-i18n';
-  import { useClipboard } from '@vueuse/core';
   import { useAppStore } from '@/store';
   import Block from './block.vue';
 
@@ -34,7 +32,6 @@
 
   const appStore = useAppStore();
   const { t } = useI18n();
-  const { copy } = useClipboard();
   const visible = computed(() => appStore.globalSettings);
   const contentOpts = computed(() => [
     { name: 'settings.navbar', key: 'navbar', defaultVal: appStore.navbar },
@@ -53,17 +50,21 @@
     },
   ]);
   const othersOpts = [
-    { name: 'settings.colorWeek', key: 'colorWeek', defaultVal: false },
+    {
+      name: 'settings.colorWeek',
+      key: 'colorWeek',
+      defaultVal: appStore.colorWeek,
+    },
   ];
 
   const cancel = () => {
     appStore.updateSettings({ globalSettings: false });
     emit('cancel');
   };
-  const copySettings = async () => {
-    const text = JSON.stringify(appStore.$state, null, 2);
-    await copy(text);
-    Message.success(t('settings.copySettings.message'));
+  // TODO 待验证
+  const saveSettings = async () => {
+    Message.success(t('settings.saveSetting.message'));
+    cancel();
   };
   const setVisible = () => {
     appStore.updateSettings({ globalSettings: true });
@@ -74,7 +75,7 @@
   .fixed-settings {
     position: fixed;
     top: 280px;
-    right: 0px;
+    right: 0;
 
     svg {
       font-size: 18px;

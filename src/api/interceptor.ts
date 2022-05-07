@@ -1,5 +1,5 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Message } from '@arco-design/web-vue';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import {
   clearAccessToken,
@@ -11,7 +11,6 @@ import {
 } from '@/utils/auth';
 import { HttpResponse } from '@/types/response';
 import router from '@/router';
-import axiosRetry from 'axios-retry';
 import { get } from 'lodash';
 import { StatusCodes } from 'http-status-codes';
 import { RefreshRequest } from '@/api/model/public';
@@ -25,9 +24,16 @@ const { t } = i18n.global;
 
 // resetSession
 const resetSession = () => {
-  clearRefreshToken();
-  clearAccessToken();
-  router.push('/login');
+  Modal.error({
+    title: '鉴权失败',
+    content: '你的token已经过期，请重新登录，如果问题依然存在，请联系管理员',
+    okText: '重新登录',
+    async onOk() {
+      clearRefreshToken();
+      clearAccessToken();
+      router.push('/login');
+    },
+  });
 };
 
 // showError 展示错误
@@ -52,11 +58,11 @@ const errorHandler = async (
         if (token && token.length > 0) {
           Message.info('自动续期中，请稍候...');
           try {
-            const resp = await refreshToken({
+            const { metadata } = await refreshToken({
               refreshToken: token,
             } as RefreshRequest);
-            setAccessToken(resp.metadata.accessToken);
-            setRefreshToken(resp.metadata.refreshToken);
+            setAccessToken(metadata.accessToken);
+            setRefreshToken(metadata.refreshToken);
             Message.success('续期成功');
             window.location.reload();
           } catch (e) {

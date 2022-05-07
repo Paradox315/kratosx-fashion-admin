@@ -10,7 +10,7 @@ import {
   setAccessToken,
   setRefreshToken,
 } from '@/utils/auth';
-
+// TODO 持久化
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
     /** @format uint64 */
@@ -20,8 +20,8 @@ const useUserStore = defineStore('user', {
     mobile: undefined,
     avatar: undefined,
     nickname: undefined,
-    gender: undefined,
-    creator: undefined,
+    gender: '未知',
+    creator: 'admin',
     address: '未知',
     country: '中国',
     city: '上海',
@@ -32,7 +32,8 @@ const useUserStore = defineStore('user', {
     /** @format int64 */
     age: 0,
     registerDate: undefined,
-    roles: undefined,
+    roles: [],
+    currentRole: undefined,
   }),
 
   getters: {
@@ -42,11 +43,8 @@ const useUserStore = defineStore('user', {
   },
 
   actions: {
-    switchRoles() {
-      return new Promise((resolve) => {
-        // this.role = this.role === 'user' ? 'admin' : 'user';
-        // resolve(this.role);
-      });
+    switchRoles(roleID: number | string) {
+      this.currentRole = roleID;
     },
     // Set user's information
     setInfo(info: Partial<UserState>) {
@@ -67,9 +65,9 @@ const useUserStore = defineStore('user', {
     // Login
     async login(loginForm: LoginRequest) {
       try {
-        const res = await userLogin(loginForm);
-        setAccessToken(res.metadata.accessToken);
-        setRefreshToken(res.metadata.refreshToken);
+        const { metadata } = await userLogin(loginForm);
+        setAccessToken(metadata.accessToken);
+        setRefreshToken(metadata.refreshToken);
       } catch (err) {
         clearAccessToken();
         clearRefreshToken();
@@ -80,7 +78,6 @@ const useUserStore = defineStore('user', {
     // Logout
     async logout() {
       await userLogout();
-
       this.resetInfo();
       clearRefreshToken();
       clearAccessToken();
@@ -93,6 +90,9 @@ const useUserStore = defineStore('user', {
       await updateUser(req);
       await this.info();
     },
+  },
+  persist: {
+    enabled: true,
   },
 });
 

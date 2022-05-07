@@ -11,7 +11,7 @@ export default {
   children: [
     {
       path: 'workplace',
-      name: 'Workplace',
+      name: 'workplace',
       component: () => import('@/views/dashboard/workplace/index.vue'),
       meta: {
         locale: 'menu.dashboard.workplace',

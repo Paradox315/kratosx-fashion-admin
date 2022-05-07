@@ -9,19 +9,16 @@ export default function usePermission() {
         !route.meta?.requiresAuth ||
         !route.meta?.roles ||
         route.meta?.roles?.includes('*') ||
-        route.meta?.roles?.some((role) => userStore.roles?.includes(role))
+        route.meta?.roles?.includes(userStore.currentRole as string)
       );
     },
-    findFirstPermissionRoute(_routers: any, roles: any) {
+    findFirstPermissionRoute(_routers: any, role = '*') {
       const cloneRouters = [..._routers];
       while (cloneRouters.length) {
         const firstElement = cloneRouters.shift();
         if (
           firstElement?.meta?.roles?.find((el: string[]) => {
-            return (
-              el.includes('*') ||
-              el.some((role: string) => roles.includes(role))
-            );
+            return el.includes('*') || el.includes(role);
           })
         )
           return { name: firstElement.name };

@@ -342,10 +342,12 @@
   import TableSetting from '@/components/table-setting/index.vue';
   import useDeleteBatch from '@/hooks/delete-batch';
   import { usePagination } from 'vue-request';
+  import { useUserStore } from '@/store';
 
   const { t } = useI18n();
   const { setting, showSetting, setSetting } = useTableSetting();
   const { deleteBatch, setDeleteBatch, resetDeleteBatch } = useDeleteBatch();
+  const userStore = useUserStore();
   const {
     data: userData,
     current: userCurrent,
@@ -615,7 +617,7 @@
         await deleteUser(id);
         Message.success(t('system.user.delUserSuccess'));
         resetDeleteBatch();
-        refresh();
+        await refresh();
       },
     });
   };
@@ -628,7 +630,7 @@
         Message.success(t('system.user.delUserSuccess'));
         selectedUsers.value = [];
         resetDeleteBatch();
-        refresh();
+        await refresh();
       },
     });
   };
@@ -638,6 +640,9 @@
       try {
         loading.value = true;
         if (isEdit.value) {
+          if (userForm.id === userStore.id) {
+            await userStore.info();
+          }
           await updateUser(userForm);
           Message.success(t('system.user.form.update'));
         } else {

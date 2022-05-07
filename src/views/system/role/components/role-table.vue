@@ -127,7 +127,7 @@
   import { Menu, Router } from '@/api/model/resource';
   import {
     getActionByRole,
-    getMenuTreeByRole,
+    getMenuByRole,
     getRouterTreeByRole,
   } from '@/api/resource';
   import { IconDelete, IconPlus } from '@arco-design/web-vue/es/icon';
@@ -324,7 +324,7 @@
   const showResource = async (id: string) => {
     showResourceSetting.value = true;
     roleId.value = id;
-    const { metadata: roleMenu } = await getMenuTreeByRole(id);
+    const { metadata: roleMenu } = await getMenuByRole(id);
     const { metadata: roleRouter } = await getRouterTreeByRole(id);
     const { metadata: roleAct } = await getActionByRole(id);
     resetRoleForm();

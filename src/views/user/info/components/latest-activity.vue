@@ -1,9 +1,14 @@
 <template>
   <a-card class="general-card" :title="$t('userInfo.title.latestActivity')">
     <template #extra>
-      <a-link :disabled="noMore" @click="loadMore"
-        >{{ $t('userInfo.showMore') }}
-      </a-link>
+      <a-pagination
+        :current="current"
+        :page-size="pageSize"
+        :total="total"
+        simple
+        @change="changeCurrent"
+        @page-size-change="changePageSize"
+      />
     </template>
     <a-list :bordered="false">
       <a-list-item
@@ -26,12 +31,17 @@
             </a-col>
           </a-row>
         </a-skeleton>
-        <a-list-item-meta
-          v-else
-          :title="
-            computed(() => `${log.os}-${log.deviceType}-${log.Type}`).value
-          "
-        >
+        <a-list-item-meta v-else>
+          <template #title>
+            <a-space>
+              <span style="margin-right: 10px; font-size: medium">{{
+                log.type
+              }}</span>
+              <icon-schedule /><span style="font-weight: lighter">{{
+                log.time
+              }}</span>
+            </a-space>
+          </template>
           <template #avatar>
             <a-avatar shape="square">
               <img
@@ -61,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
+  import { computed, ref } from 'vue';
   import { getLogList } from '@/api/user';
   import windowsImage from '@/assets/images/os/windows.png';
   import macImage from '@/assets/images/os/mac.png';
@@ -74,17 +84,20 @@
   import { usePagination } from 'vue-request';
 
   const { t } = useI18n();
-  const { data, current, totalPage, loading } = usePagination(getLogList, {
+  const {
+    data,
+    current,
+    pageSize,
+    total,
+    loading,
+    changeCurrent,
+    changePageSize,
+  } = usePagination(getLogList, {
     pagination: {
       totalKey: 'metadata.total',
     },
   });
-
-  const loadMore = () => {
-    current.value += 1;
-  };
   const logList = computed(() => data.value?.metadata?.list || []);
-  const noMore = computed(() => current >= totalPage);
   const getAvatar = (os: string | undefined) => {
     let avatar = osImage;
     if (os?.toLowerCase().includes('windows')) {

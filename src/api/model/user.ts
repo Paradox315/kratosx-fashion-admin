@@ -90,7 +90,7 @@ export interface UserLog {
   os?: string;
   device?: string;
   deviceType?: string;
-  Type?: string;
+  type?: string;
 }
 
 export interface UserReply {
@@ -166,5 +166,6 @@ export interface UserState {
   /** @format int64 */
   age?: number;
   registerDate?: string;
-  roles?: string[];
+  roles: (string | number)[];
+  currentRole?: string | number;
 }

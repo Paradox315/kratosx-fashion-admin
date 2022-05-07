@@ -2,7 +2,6 @@ import { useRouter } from 'vue-router';
 import { Message } from '@arco-design/web-vue';
 
 import { useUserStore } from '@/store';
-import { LoginReply, LoginRequest } from '@/api/model/public';
 
 export default function useUser() {
   const router = useRouter();

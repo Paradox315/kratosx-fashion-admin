@@ -27,6 +27,7 @@
           .getRoutes()
           .find((el) => el.name === 'root') as RouteRecordNormalized;
       });
+      console.log('appRoute', appRoute.value);
       const menuTree = computed(() => {
         const copyRouter = JSON.parse(JSON.stringify(appRoute.value.children));
         copyRouter.sort(
@@ -152,6 +153,7 @@
       display: flex;
       align-items: center;
     }
+
     .arco-icon {
       &:not(.arco-icon-down) {
         font-size: 18px;

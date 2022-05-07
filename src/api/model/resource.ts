@@ -41,9 +41,9 @@ export interface Menu {
 
   /** @format uint64 */
   parentId?: string;
-  path?: string;
-  name?: string;
-  component?: string;
+  path: string;
+  name: string;
+  component: string;
   description?: string;
   meta?: MenuMeta;
   children?: Menu[];
@@ -59,7 +59,7 @@ export interface MenuAction {
 
 export interface MenuMeta {
   roles?: string[];
-  requireAuth?: boolean;
+  requireAuth: boolean;
   icon?: string;
   locale?: string;
 

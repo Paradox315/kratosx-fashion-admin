@@ -127,6 +127,14 @@
           </a-avatar>
           <template #content>
             <a-doption>
+              <a-space @click="switchRoles">
+                <icon-swap />
+                <span>
+                  {{ $t('messageBox.switchRoles') }}
+                </span>
+              </a-space>
+            </a-doption>
+            <a-doption>
               <a-space @click="$router.push({ name: 'Info' })">
                 <icon-user />
                 <span>
@@ -160,8 +168,8 @@
 <script lang="ts" setup>
   import { computed, ref, inject } from 'vue';
   import { Message } from '@arco-design/web-vue';
-  import { useDark, useToggle } from '@vueuse/core';
-  import { useAppStore, useUserStore } from '@/store';
+  import { useCycleList, useDark, useToggle } from '@vueuse/core';
+  import { useAppStore, usePermissionStore, useUserStore } from '@/store';
   import { LOCALE_OPTIONS } from '@/locale';
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
@@ -169,11 +177,16 @@
 
   const appStore = useAppStore();
   const userStore = useUserStore();
+  const { resetRoutes } = usePermissionStore();
   const { logout } = useUser();
   const { changeLocale } = useLocale();
   const locales = [...LOCALE_OPTIONS];
+  const { next, state } = useCycleList(computed(() => userStore.roles).value);
   const avatar = computed(() => {
     return userStore.avatar;
+  });
+  const roles = computed(() => {
+    return userStore.roles;
   });
   const theme = computed(() => {
     return appStore.theme;
@@ -204,6 +217,7 @@
     refBtn.value.dispatchEvent(event);
   };
   const handleLogout = () => {
+    resetRoutes();
     logout();
   };
   const setDropDownVisible = () => {
@@ -215,8 +229,9 @@
     triggerBtn.value.dispatchEvent(event);
   };
   const switchRoles = async () => {
-    const res = await userStore.switchRoles();
-    Message.success(res as string);
+    next();
+    await userStore.switchRoles(state.value);
+    Message.success(`当前角色ID： ${state.value}`);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu');
 </script>
@@ -240,9 +255,11 @@
     display: flex;
     padding-right: 20px;
     list-style: none;
+
     :deep(.locale-select) {
       border-radius: 20px;
     }
+
     li {
       display: flex;
       align-items: center;
@@ -253,16 +270,19 @@
       color: var(--color-text-1);
       text-decoration: none;
     }
+
     .nav-btn {
-      border-color: rgb(var(--gray-2));
       color: rgb(var(--gray-8));
       font-size: 16px;
+      border-color: rgb(var(--gray-2));
     }
+
     .trigger-btn,
     .ref-btn {
       position: absolute;
       bottom: 14px;
     }
+
     .trigger-btn {
       margin-left: 14px;
     }

@@ -7,8 +7,6 @@ import {
   MenuRequest,
   RouterReply,
 } from '@/api/model/resource';
-import axios from 'axios';
-import { HttpResponse } from '@/types/response';
 import { Pagination } from '@/types/global';
 import service from '@/utils/service';
 
@@ -30,11 +28,15 @@ export function getMenuTree() {
   return service.get<MenuReply>(`${prefix}/menu`);
 }
 
-export function getMenuTreeByRole(roleId: string) {
+export function getMenuByRole(roleId: string) {
   return service.get<MenuReply>(`${prefix}/menu/role/${roleId}`);
 }
-// TODO 刷新缓存
-export function getMenuList(params: Pagination, refresh?: boolean) {
+
+export function getMenuTreeByRole(roleId: string) {
+  return service.get<MenuReply>(`${prefix}/menu/tree/${roleId}`);
+}
+
+export function getMenuList(params: Pagination) {
   return service.get<ListMenuReply>(
     `${prefix}/menu/list/${params.current}/${params.pageSize}`
   );

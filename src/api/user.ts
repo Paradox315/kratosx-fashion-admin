@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { HttpResponse } from '@/types/response';
 import {
   IDReply,
   ListSearchRequest,

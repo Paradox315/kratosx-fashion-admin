@@ -1,547 +1,153 @@
 <template>
   <a-select
-    :options="icons"
     :placeholder="$t('iconPicker.placeholder')"
     unmount-on-close
+    allow-clear
   >
+    <a-option value="icon-apps" :label="$t('icon.apps')">
+      <a-space
+        ><icon-apps /> <span>{{ $t('icon.apps') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-bar-chart" :label="$t('icon.bar-chart')">
+      <a-space
+        ><icon-bar-chart /> <span>{{ $t('icon.bar-chart') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-book" :label="$t('icon.book')">
+      <a-space
+        ><icon-book /> <span>{{ $t('icon.book') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-bookmark" :label="$t('icon.bookmark')">
+      <a-space
+        ><icon-bookmark /> <span>{{ $t('icon.bookmark') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-branch" :label="$t('icon.branch')">
+      <a-space
+        ><icon-branch /> <span>{{ $t('icon.branch') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-bug" :label="$t('icon.bug')">
+      <a-space
+        ><icon-bug /> <span>{{ $t('icon.bug') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-bulb" :label="$t('icon.bulb')">
+      <a-space
+        ><icon-bulb /> <span>{{ $t('icon.bulb') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-calendar" :label="$t('icon.calendar')">
+      <a-space
+        ><icon-calendar /> <span>{{ $t('icon.calendar') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-camera" :label="$t('icon.camera')">
+      <a-space
+        ><icon-camera /> <span>{{ $t('icon.camera') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-cloud" :label="$t('icon.cloud')">
+      <a-space
+        ><icon-cloud /> <span>{{ $t('icon.cloud') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-command" :label="$t('icon.command')">
+      <a-space
+        ><icon-command /> <span>{{ $t('icon.command') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-common" :label="$t('icon.common')">
+      <a-space
+        ><icon-common /> <span>{{ $t('icon.common') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-computer" :label="$t('icon.computer')">
+      <a-space
+        ><icon-computer /> <span>{{ $t('icon.computer') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-dashboard" :label="$t('icon.dashboard')">
+      <a-space
+        ><icon-dashboard /> <span>{{ $t('icon.dashboard') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-copyright" :label="$t('icon.copyright')">
+      <a-space
+        ><icon-copyright /> <span>{{ $t('icon.copyright') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-desktop" :label="$t('icon.desktop')">
+      <a-space
+        ><icon-desktop /> <span>{{ $t('icon.desktop') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-dice" :label="$t('icon.dice')">
+      <a-space
+        ><icon-dice /> <span>{{ $t('icon.dice') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-email" :label="$t('icon.email')">
+      <a-space
+        ><icon-email /> <span>{{ $t('icon.email') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-experiment" :label="$t('icon.experiment')">
+      <a-space
+        ><icon-experiment /> <span>{{ $t('icon.experiment') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-layers" :label="$t('icon.layers')">
+      <a-space
+        ><icon-layers /> <span>{{ $t('icon.layers') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-fire" :label="$t('icon.fire')">
+      <a-space
+        ><icon-fire /> <span>{{ $t('icon.fire') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-lock" :label="$t('icon.lock')">
+      <a-space
+        ><icon-lock /> <span>{{ $t('icon.lock') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-mobile" :label="$t('icon.mobile')">
+      <a-space
+        ><icon-mobile /> <span>{{ $t('icon.mobile') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-public" :label="$t('icon.public')">
+      <a-space
+        ><icon-public /> <span>{{ $t('icon.public') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-relation" :label="$t('icon.relation')">
+      <a-space
+        ><icon-relation /> <span>{{ $t('icon.lock') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-robot" :label="$t('icon.robot')">
+      <a-space
+        ><icon-robot /> <span>{{ $t('icon.robot') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-wifi" :label="$t('icon.wifi')">
+      <a-space
+        ><icon-wifi /> <span>{{ $t('icon.wifi') }}</span></a-space
+      >
+    </a-option>
+    <a-option value="icon-safe" :label="$t('icon.safe')">
+      <a-space
+        ><icon-safe /> <span>{{ $t('icon.safe') }}</span></a-space
+      >
+    </a-option>
   </a-select>
 </template>
 
-<script lang="ts" setup>
-  import { SelectOptionData } from '@arco-design/web-vue';
-  import {
-    IconApps,
-    IconBarChart,
-    IconBook,
-    IconBookmark,
-    IconBranch,
-    IconBug,
-    IconBulb,
-    IconCalendar,
-    IconCamera,
-    IconCloud,
-    IconCommand,
-    IconCommon,
-    IconCompass,
-    IconComputer,
-    IconCopyright,
-    IconDashboard,
-    IconDesktop,
-    IconDice,
-    IconEmail,
-    IconExperiment,
-    IconFire,
-    IconLayers,
-    IconLock,
-    IconMobile,
-    IconPublic,
-    IconRelation,
-    IconRobot,
-    IconSafe,
-    IconWifi,
-  } from '@arco-design/web-vue/es/icon';
-  import { h } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { SelectOptionValue } from '@arco-design/web-vue/es/select/interface';
-
-  const { t } = useI18n();
-  const icons = [
-    {
-      value: 'icon-apps',
-      label: t('icon.apps'),
-      render: () =>
-        h('div', {}, [
-          h(IconApps),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.apps')
-          ),
-        ]),
-    },
-
-    {
-      value: 'icon-bar-chart',
-      label: t('icon.bar-chart'),
-      render: () =>
-        h('div', {}, [
-          h(IconBarChart),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.bar-chart')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-book',
-      label: t('icon.book'),
-      render: () =>
-        h('div', {}, [
-          h(IconBook),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.book')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-bookmark',
-      label: t('icon.bookmark'),
-      render: () =>
-        h('div', {}, [
-          h(IconBookmark),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.bookmark')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-branch',
-      label: t('icon.branch'),
-      render: () =>
-        h('div', {}, [
-          h(IconBranch),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.branch')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-bug',
-      label: t('icon.bug'),
-      render: () =>
-        h('div', {}, [
-          h(IconBug),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.bug')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-bulb',
-      label: t('icon.bulb'),
-      render: () =>
-        h('div', {}, [
-          h(IconBulb),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.bulb')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-calendar',
-      label: t('icon.calendar'),
-      render: () =>
-        h('div', {}, [
-          h(IconCalendar),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.calendar')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-camera',
-      label: t('icon.camera'),
-      render: () =>
-        h('div', {}, [
-          h(IconCamera),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.camera')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-cloud',
-      label: t('icon.cloud'),
-      render: () =>
-        h('div', {}, [
-          h(IconCloud),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.cloud')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-command',
-      label: t('icon.command'),
-      render: () =>
-        h('div', {}, [
-          h(IconCommand),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.command')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-common',
-      label: t('icon.common'),
-      render: () =>
-        h('div', {}, [
-          h(IconCommon),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.common')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-compass',
-      label: t('icon.compass'),
-      render: () =>
-        h('div', {}, [
-          h(IconCompass),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.compass')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-computer',
-      label: t('icon.computer'),
-      render: () =>
-        h('div', {}, [
-          h(IconComputer),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.computer')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-dashboard',
-      label: t('icon.dashboard'),
-      render: () =>
-        h('div', {}, [
-          h(IconDashboard),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.dashboard')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-copyright',
-      label: t('icon.copyright'),
-      render: () =>
-        h('div', {}, [
-          h(IconCopyright),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.copyright')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-desktop',
-      label: t('icon.desktop'),
-      render: () =>
-        h('div', {}, [
-          h(IconDesktop),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.desktop')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-dice',
-      label: t('icon.dice'),
-      render: () =>
-        h('div', {}, [
-          h(IconDice),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.dice')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-email',
-      label: t('icon.email'),
-      render: () =>
-        h('div', {}, [
-          h(IconEmail),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.email')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-experiment',
-      label: t('icon.experiment'),
-      render: () =>
-        h('div', {}, [
-          h(IconExperiment),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.experiment')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-layers',
-      label: t('icon.layers'),
-      render: () =>
-        h('div', {}, [
-          h(IconLayers),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.layers')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-fire',
-      label: t('icon.fire'),
-      render: () =>
-        h('div', {}, [
-          h(IconFire),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.fire')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-lock',
-      label: t('icon.lock'),
-      render: () =>
-        h('div', {}, [
-          h(IconLock),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.lock')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-mobile',
-      label: t('icon.mobile'),
-      render: () =>
-        h('div', {}, [
-          h(IconMobile),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.mobile')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-public',
-      label: t('icon.public'),
-      render: () =>
-        h('div', {}, [
-          h(IconPublic),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.public')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-relation',
-      label: t('icon.relation'),
-      render: () =>
-        h('div', {}, [
-          h(IconRelation),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.relation')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-robot',
-      label: t('icon.robot'),
-      render: () =>
-        h('div', {}, [
-          h(IconRobot),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.robot')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-wifi',
-      label: t('icon.wifi'),
-      render: () =>
-        h('div', {}, [
-          h(IconWifi),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.wifi')
-          ),
-        ]),
-    },
-    {
-      value: 'icon-safe',
-      label: t('icon.safe'),
-      render: () =>
-        h('div', {}, [
-          h(IconSafe),
-          h(
-            'span',
-            {
-              style: {
-                marginLeft: '10px',
-              },
-            },
-            t('icon.safe')
-          ),
-        ]),
-    },
-  ];
-</script>
+<script lang="ts" setup></script>
 
 <script lang="ts">
   export default {
