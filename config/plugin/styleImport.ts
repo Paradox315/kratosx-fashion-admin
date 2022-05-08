@@ -26,6 +26,7 @@ export default function configStyleImportPlugin() {
             'step',
             'card-grid',
             'card-meta',
+            'collapse-item',
             'collapse-panel',
             'descriptions-item',
             'list-item',

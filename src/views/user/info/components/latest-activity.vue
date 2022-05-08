@@ -53,7 +53,7 @@
           <template #description>
             <a-collapse :bordered="false" expand-icon-position="right">
               <a-collapse-item
-                key="1"
+                :key="1"
                 :header="$t('userInfo.loginLog.viewDetail')"
               >
                 <a-descriptions
@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
+  import { computed } from 'vue';
   import { getLogList } from '@/api/user';
   import windowsImage from '@/assets/images/os/windows.png';
   import macImage from '@/assets/images/os/mac.png';
