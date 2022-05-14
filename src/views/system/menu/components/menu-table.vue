@@ -278,8 +278,11 @@
   import useTableSetting from '@/components/table-setting/table-setting';
   import useDeleteBatch from '@/hooks/delete-batch';
   import { usePagination } from 'vue-request';
+  import { usePermissionStore, useUserStore } from '@/store';
 
   const { t } = useI18n();
+  const { setRoutes } = usePermissionStore();
+  const userStore = useUserStore();
   const { setting, showSetting, setSetting } = useTableSetting();
   const { deleteBatch, setDeleteBatch, resetDeleteBatch } = useDeleteBatch();
   const {
@@ -300,7 +303,9 @@
   const menus = computed(() => data.value?.metadata.list || []);
   const formRef = ref<FormInstance>();
   const menuForm = reactive<MenuRequest>({
-    meta: {},
+    meta: {
+      requireAuth: true,
+    },
     actions: [],
   });
   const showModal = ref<boolean>(false);
@@ -362,6 +367,18 @@
   const disableDeleteBtn = computed(() => {
     return selectedMenus.value.length === 0 || !deleteBatch.value;
   });
+  const refreshRoutes = () => {
+    refresh();
+    setRoutes(userStore.currentRole as string);
+    Modal.warning({
+      title: t('system.menu.refreshRoutes'),
+      content: t('system.menu.refreshRoutes.warning'),
+      okText: t('system.menu.refresh.confirm'),
+      onOk: () => {
+        window.location.reload();
+      },
+    });
+  };
   const onSelect = (rowKeys: string[]) => {
     selectedMenus.value = rowKeys;
   };
@@ -423,7 +440,7 @@
       onOk: async () => {
         await deleteMenu(id);
         Message.success(t('system.menu.delete.success'));
-        await refresh();
+        await refreshRoutes();
       },
     });
   };
@@ -436,7 +453,7 @@
         Message.success(t('system.menu.delete.success'));
         selectedMenus.value = [];
         resetDeleteBatch();
-        await refresh();
+        await refreshRoutes();
       },
     });
   };
@@ -452,7 +469,7 @@
           await createMenu(menuForm);
           Message.success(t('system.menu.add.success'));
         }
-        await refresh();
+        await refreshRoutes();
         done();
       } catch (err) {
         done(false);

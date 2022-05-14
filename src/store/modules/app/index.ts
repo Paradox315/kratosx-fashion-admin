@@ -40,6 +40,12 @@ const useAppStore = defineStore('app', {
   },
   persist: {
     enabled: true,
+    strategies: [
+      {
+        key: 'setting',
+        storage: localStorage,
+      },
+    ],
   },
 });
 

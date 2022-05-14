@@ -1,6 +1,45 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { HttpResponse } from '@/types/response';
 
+const pendingRequest = new Map<string, any>();
+const { CancelToken } = axios;
+const source = CancelToken.source();
+
+const generateReqKey = (config: AxiosRequestConfig) => {
+  const { method, url, params, data } = config;
+  return [method, url, JSON.stringify(params), JSON.stringify(data)].join('&');
+};
+
+const resGenerateReqKey = (config: AxiosRequestConfig) => {
+  const { method, url, params, data } = config;
+  return [method, url, params, data].join('&');
+};
+
+const addPendingRequest = (config: any) => {
+  const requestKey = generateReqKey(config);
+  config.cancelToken =
+    config.cancelToken ||
+    new axios.CancelToken((cancel: any) => {
+      if (!pendingRequest.has(requestKey)) {
+        pendingRequest.set(requestKey, cancel);
+      }
+    });
+};
+const removePendingRequest = (config: any) => {
+  const requestKey = generateReqKey(config);
+  if (pendingRequest.has(requestKey)) {
+    config.cancelToken = source.token;
+    source.cancel();
+  }
+};
+
+const clearPending = () => {
+  pendingRequest.forEach((cancel: any, requestKey: string) => {
+    cancel(requestKey);
+  });
+  pendingRequest.clear();
+};
+
 class Request {
   private instance: AxiosInstance;
 
@@ -55,3 +94,11 @@ class Request {
 }
 const service = new Request(axios);
 export default service;
+export {
+  generateReqKey,
+  resGenerateReqKey,
+  addPendingRequest,
+  removePendingRequest,
+  clearPending,
+  pendingRequest,
+};

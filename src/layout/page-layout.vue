@@ -20,7 +20,7 @@
 <script lang="ts" setup>
   import { computed } from 'vue';
   import { useTabBarStore } from '@/store';
-  import { FadeInOut, SlideInOut } from 'vue3-transitions';
+  import { SlideInOut } from 'vue3-transitions';
 
   const tabBarStore = useTabBarStore();
 

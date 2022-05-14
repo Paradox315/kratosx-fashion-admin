@@ -27,7 +27,6 @@
           .getRoutes()
           .find((el) => el.name === 'root') as RouteRecordNormalized;
       });
-      console.log('appRoute', appRoute.value);
       const menuTree = computed(() => {
         const copyRouter = JSON.parse(JSON.stringify(appRoute.value.children));
         copyRouter.sort(

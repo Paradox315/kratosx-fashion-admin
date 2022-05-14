@@ -41,4 +41,8 @@ export default {
   'system.menu.fetch.fail': 'Fetch Menu Fail',
   'system.menu.delete.title': 'Delete Menu',
   'system.menu.delete.content': 'Are you sure to delete this menu?',
+  'system.menu.refreshRoutes': 'Refresh Routes',
+  'system.menu.refreshRoutes.warning':
+    'The routes has changed, please refresh the routes',
+  'system.menu.refresh.confirm': 'Confirm Refresh',
 };

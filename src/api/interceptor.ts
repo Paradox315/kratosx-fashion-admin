@@ -10,7 +10,6 @@ import {
   setRefreshToken,
 } from '@/utils/auth';
 import { HttpResponse } from '@/types/response';
-import router from '@/router';
 import { get } from 'lodash';
 import { StatusCodes } from 'http-status-codes';
 import { RefreshRequest } from '@/api/model/public';
@@ -18,10 +17,18 @@ import { JWT_AUTH_ERROR } from '@/enums/error_enum';
 import i18n from '@/locale';
 import { useCookies } from 'vue3-cookies';
 import { refreshToken } from '@/api/public';
+import router from '@/router';
+import {
+  addPendingRequest,
+  pendingRequest,
+  removePendingRequest,
+  resGenerateReqKey,
+} from '@/utils/service';
 
 const { cookies } = useCookies();
 const { t } = i18n.global;
 
+let refreshStatus = false;
 // resetSession
 const resetSession = () => {
   Modal.error({
@@ -31,7 +38,9 @@ const resetSession = () => {
     async onOk() {
       clearRefreshToken();
       clearAccessToken();
-      router.push('/login');
+      return router.push({
+        name: 'login',
+      });
     },
   });
 };
@@ -57,16 +66,20 @@ const errorHandler = async (
         const token = getRefreshToken();
         if (token && token.length > 0) {
           Message.info('自动续期中，请稍候...');
-          try {
-            const { metadata } = await refreshToken({
-              refreshToken: token,
-            } as RefreshRequest);
-            setAccessToken(metadata.accessToken);
-            setRefreshToken(metadata.refreshToken);
-            Message.success('续期成功');
-            window.location.reload();
-          } catch (e) {
-            resetSession();
+          if (!refreshStatus) {
+            try {
+              const { metadata } = await refreshToken({
+                refreshToken: token,
+              } as RefreshRequest);
+              setAccessToken(metadata.accessToken);
+              setRefreshToken(metadata.refreshToken);
+              Message.success('续期成功');
+              window.location.reload();
+            } catch (e) {
+              resetSession();
+            } finally {
+              refreshStatus = true;
+            }
           }
         } else {
           resetSession();
@@ -98,7 +111,7 @@ const errorHandler = async (
 if (import.meta.env.VITE_API_BASE_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 }
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     const token = getAccessToken();
@@ -112,16 +125,27 @@ axios.interceptors.request.use(
     if (csrf) {
       config.headers['X-Csrf-Token'] = csrf;
     }
+    removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
+    addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
     return config;
   },
   (error: any) => {
-    Promise.reject(error);
+    pendingRequest.clear();
+    return Promise.reject(error);
   }
 );
 // add response interceptors
 axios.interceptors.response.use(
-  (response: AxiosResponse<HttpResponse>) => response.data,
+  (response: AxiosResponse<HttpResponse>) => {
+    const requestKey = resGenerateReqKey(response.config);
+    pendingRequest.delete(requestKey);
+    return response.data;
+  },
   async (error) => {
+    removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
     const status = get(error, 'response.status');
     const res = get(error, 'response.data');
     if (status) {

@@ -1,5 +1,4 @@
 import { Pagination } from '@/types/global';
-import axios from 'axios';
 import {
   IDReply,
   ListRoleReply,

@@ -1,5 +1,4 @@
-import { ACCESS_TOKEN, REFRESH_TOKEN, ROUTERS } from '@/enums/cache_enum';
-import { RouteRecordRaw } from 'vue-router';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/enums/cache_enum';
 
 const modules = import.meta.glob('../views/**/*.vue');
 

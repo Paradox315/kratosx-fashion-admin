@@ -42,4 +42,7 @@ export default {
   'system.menu.fetch.fail': '获取菜单失败',
   'system.menu.delete.title': '删除菜单',
   'system.menu.delete.content': '确定删除该菜单吗？',
+  'system.menu.refreshRoutes': '刷新路由',
+  'system.menu.refreshRoutes.warning': '项目路由已更改，请重新加载页面',
+  'system.menu.refresh.confirm': '确定刷新路由吗？',
 };

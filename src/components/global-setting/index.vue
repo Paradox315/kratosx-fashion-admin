@@ -61,7 +61,6 @@
     appStore.updateSettings({ globalSettings: false });
     emit('cancel');
   };
-  // TODO 待验证
   const saveSettings = async () => {
     Message.success(t('settings.saveSetting.message'));
     cancel();

@@ -58,8 +58,8 @@ const useUserStore = defineStore('user', {
 
     // Get user's information
     async info() {
-      const res = await initUserInfo();
-      this.setInfo(res.metadata);
+      const { metadata: info } = await initUserInfo();
+      this.setInfo(info);
     },
 
     // Login

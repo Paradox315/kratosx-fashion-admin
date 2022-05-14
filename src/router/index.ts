@@ -23,6 +23,16 @@ const router = createRouter({
       component: DefaultLayout,
       children: appRoutes,
     },
+    {
+      path: '/not-found',
+      name: 'notFound',
+      component: () => import('@/views/not-found/index.vue'),
+    },
+    {
+      path: '/network-error',
+      name: 'networkError',
+      component: () => import('@/views/network-error/index.vue'),
+    },
   ],
   scrollBehavior() {
     return { top: 0 };
