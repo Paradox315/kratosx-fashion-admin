@@ -253,7 +253,11 @@
         </a-radio-group>
       </a-form-item>
       <a-form-item field="status" :label="$t('system.user.status')">
-        <a-switch v-model="userForm.status" />
+        <a-switch
+          v-model="userForm.status"
+          :checked-value="1"
+          :unchecked-value="2"
+        />
       </a-form-item>
       <a-form-item
         field="roles"
@@ -568,7 +572,7 @@
     userForm.nickname = '';
     userForm.email = '';
     userForm.mobile = '';
-    userForm.status = true;
+    userForm.status = 1;
     userForm.roles = [];
     userForm.gender = 0;
     userForm.avatar = 'http://dummyimage.com/100x100';
@@ -594,7 +598,7 @@
     userForm.nickname = record.nickname;
     userForm.email = record.email;
     userForm.mobile = record.mobile;
-    userForm.status = record.status;
+    userForm.status = record.status ? 1 : 2;
     userForm.gender =
       // eslint-disable-next-line no-nested-ternary
       record.gender === '男' ? 1 : record.gender === '女' ? 2 : 0;
@@ -656,6 +660,8 @@
       } finally {
         loading.value = false;
       }
+    } else {
+      done(false);
     }
   };
   const buildQuery = () => {

@@ -355,6 +355,8 @@
       } finally {
         loading.value = false;
       }
+    } else {
+      done(false);
     }
   };
 </script>

@@ -6,6 +6,7 @@ import {
   clearRefreshToken,
   getAccessToken,
   getRefreshToken,
+  isLogin,
   setAccessToken,
   setRefreshToken,
 } from '@/utils/auth';
@@ -18,17 +19,12 @@ import i18n from '@/locale';
 import { useCookies } from 'vue3-cookies';
 import { refreshToken } from '@/api/public';
 import router from '@/router';
-import {
-  addPendingRequest,
-  pendingRequest,
-  removePendingRequest,
-  resGenerateReqKey,
-} from '@/utils/service';
 
 const { cookies } = useCookies();
 const { t } = i18n.global;
 
 let refreshStatus = false;
+let logoutStatus = false;
 // resetSession
 const resetSession = () => {
   Modal.error({
@@ -48,7 +44,7 @@ const resetSession = () => {
 // showError 展示错误
 const showError = (error: any, message: string) => {
   Message.error({
-    content: message || error.message,
+    content: error.message || message,
     duration: 5 * 1000,
   });
 };
@@ -64,29 +60,37 @@ const errorHandler = async (
     case StatusCodes.UNAUTHORIZED:
       if (res?.reason === JWT_AUTH_ERROR) {
         const token = getRefreshToken();
-        if (token && token.length > 0) {
+        if (
+          token &&
+          token.length > 0 &&
+          !refreshStatus &&
+          res?.message !== 'invalid user'
+        ) {
           Message.info('自动续期中，请稍候...');
-          if (!refreshStatus) {
-            try {
-              const { metadata } = await refreshToken({
-                refreshToken: token,
-              } as RefreshRequest);
-              setAccessToken(metadata.accessToken);
-              setRefreshToken(metadata.refreshToken);
-              Message.success('续期成功');
-              window.location.reload();
-            } catch (e) {
-              resetSession();
-            } finally {
-              refreshStatus = true;
-            }
+          try {
+            const { metadata } = await refreshToken({
+              refreshToken: token,
+            } as RefreshRequest);
+            setAccessToken(metadata.accessToken);
+            setRefreshToken(metadata.refreshToken);
+            Message.success('续期成功');
+            window.location.reload();
+          } catch (e) {
+            resetSession();
+          } finally {
+            refreshStatus = true;
           }
         } else {
           resetSession();
         }
       } else {
         const userStore = useUserStore();
-        await userStore.logout();
+        if (isLogin()) {
+          if (!logoutStatus) {
+            await userStore.logout();
+            logoutStatus = true;
+          }
+        }
         resetSession();
       }
       return t('http.status.Unauthorized');
@@ -125,31 +129,22 @@ axios.interceptors.request.use(
     if (csrf) {
       config.headers['X-Csrf-Token'] = csrf;
     }
-    removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
-    addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
     return config;
   },
   (error: any) => {
-    pendingRequest.clear();
     return Promise.reject(error);
   }
 );
 // add response interceptors
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
-    const requestKey = resGenerateReqKey(response.config);
-    pendingRequest.delete(requestKey);
     return response.data;
   },
   async (error) => {
-    removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
-    if (axios.isCancel(error)) {
-      return Promise.reject(error);
-    }
     const status = get(error, 'response.status');
     const res = get(error, 'response.data');
     if (status) {
-      showError(error, await errorHandler(status, res));
+      showError(res, await errorHandler(status, res));
     }
     return Promise.reject(error);
   }

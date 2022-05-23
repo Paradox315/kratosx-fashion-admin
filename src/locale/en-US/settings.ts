@@ -8,6 +8,7 @@ export default {
   'settings.menuWidth': 'Menu Width (px)',
   'settings.navbar.theme.toLight': 'Click to use light mode',
   'settings.navbar.theme.toDark': 'Click to use dark mode',
+  'settings.navbar.fullScreen': 'Click to enter full screen',
   'settings.navbar.alerts': 'alerts',
   'settings.menu': 'Menu',
   'settings.menuCollapse': 'Menu Collapse',

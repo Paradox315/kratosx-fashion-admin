@@ -28,6 +28,7 @@ export default {
   'userInfo.title.latestNotification': '站内通知',
   'userInfo.title.myFigure': '我的形象',
   'userInfo.showMore': '查看更多',
+  'userInfo.addFigure': '添加形象',
   'userInfo.nodata': '暂无数据',
   'userInfo.visits.unit': '人次',
   'userInfo.visits.lastMonth': '较上月',

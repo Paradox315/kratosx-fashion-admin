@@ -14,10 +14,10 @@
   dependencies:
     color "^3.1.3"
 
-"@arco-design/web-vue@2.24.1":
-  version "2.24.1"
-  resolved "https://registry.npmmirror.com/@arco-design/web-vue/-/web-vue-2.24.1.tgz"
-  integrity sha512-tScZGmpPuTzE4MqC4raYLFXlouc1jVAksei2vkebenHYHugT4831rCgisN1PaZqes5PkeX/JLxr2vzFnSdL3dQ==
+"@arco-design/web-vue@^2.27.1":
+  version "2.27.1"
+  resolved "https://registry.npmmirror.com/@arco-design/web-vue/-/web-vue-2.27.1.tgz#ea1927f44f07a8f9c702479960cf2aa3e2798610"
+  integrity sha512-MhFljH99BCogeLqiYmGvOtA+305vTpPUAyRUt8WjVKaqYsd7Z9m5EtN9Yf+Jx+0WbBJTKrppqsoOglxe9vw0fg==
   dependencies:
     "@arco-design/color" "^0.4.0"
     b-tween "^0.3.3"
@@ -6069,6 +6069,14 @@ pify@^4.0.0, pify@^4.0.1:
   resolved "https://registry.npmmirror.com/pify/download/pify-4.0.1.tgz"
   integrity sha1-SyzSXFDVmHNcUCkiJP2MbfQeMjE=
 
+pikaz-iframe@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.npmmirror.com/pikaz-iframe/-/pikaz-iframe-0.1.8.tgz#ec18069063d8bfd162efb39533e1aed95c2c52c9"
+  integrity sha512-uSC0X1jg7uXLTNdCRTpSgvwargdG7NH29Ls/SbkxCjkUprJeH9UaK4+koEJvzJnjDG3m1EZLCZsY8rhm2v+DVA==
+  dependencies:
+    core-js "^3.6.5"
+    vue "^2.6.11"
+
 pinia-plugin-persist@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmmirror.com/pinia-plugin-persist/-/pinia-plugin-persist-1.0.0.tgz"
@@ -8439,6 +8447,11 @@ vue3-transitions@^1.0.0:
   dependencies:
     core-js "^3.6.5"
     vue "^3.0.0"
+
+vue@^2.6.11:
+  version "2.6.14"
+  resolved "https://registry.npmmirror.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
+  integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==
 
 vue@^3.0.0, vue@^3.2.31:
   version "3.2.31"

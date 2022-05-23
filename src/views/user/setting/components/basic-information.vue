@@ -146,11 +146,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { reactive, ref } from 'vue';
   import { FormInstance } from '@arco-design/web-vue/es/form';
   import { UserRequest } from '@/api/model/user';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
-  import { LoginRequest } from '@/api/model/public';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import { Message } from '@arco-design/web-vue';
@@ -163,17 +162,28 @@
   const { loading, setLoading } = useLoading();
   const userStore = useUserStore();
   const formRef = ref<FormInstance>();
-  const formData = ref<UserRequest>({
-    email: '',
-    nickname: '',
-    mobile: '',
-    address: '',
-    country: '',
-    city: '',
-    description: '',
-    birthday: '',
-    gender: 0,
+  const getGender = (gender: string | undefined) => {
+    if (gender === '男') {
+      return 1;
+    }
+    if (gender === '女') {
+      return 2;
+    }
+    return 0;
+  };
+  const formData = reactive<UserRequest>({
+    email: userStore.email,
+    nickname: userStore.nickname,
+    mobile: userStore.mobile,
+    address: userStore.address,
+    country: userStore.country,
+    city: userStore.city,
+    description: userStore.description,
+    birthday: userStore.birthday,
+    gender: getGender(userStore.gender),
+    figures: userStore.figures,
   });
+
   const countryOptions = ['中国'];
   const cityOptions = ['上海', '北京', '广州', '深圳', '武汉', '成都', '天津'];
   const validate = async () => {
@@ -188,7 +198,7 @@
     values,
   }: {
     errors: Record<string, ValidatedError> | undefined;
-    values: LoginRequest;
+    values: UserRequest;
   }) => {
     if (!errors) {
       setLoading(true);

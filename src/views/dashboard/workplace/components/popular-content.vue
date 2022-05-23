@@ -1,5 +1,5 @@
 <template>
-  <a-spin :loading="loading" style="width: 100%">
+  <a-spin :loading="latestLoading && popularLoading" style="width: 100%">
     <a-card
       class="general-card"
       :header-style="{ paddingBottom: '0' }"
@@ -9,92 +9,183 @@
         {{ $t('workplace.popularContent') }}
       </template>
       <template #extra>
-        <a-link>{{ $t('workplace.viewMore') }}</a-link>
+        <a-link @click="refreshData">{{ $t('workplace.refresh') }}</a-link>
       </template>
       <a-space direction="vertical" :size="10" fill>
-        <a-radio-group
-          v-model:model-value="type"
-          type="button"
-          @change="typeChange"
-        >
-          <a-radio value="text">
-            {{ $t('workplace.popularContent.text') }}
+        <a-radio-group v-model:model-value="type" type="button">
+          <a-radio value="popular">
+            {{ $t('workplace.popularContent.popular') }}
           </a-radio>
-          <a-radio value="image">
-            {{ $t('workplace.popularContent.image') }}
-          </a-radio>
-          <a-radio value="video">
-            {{ $t('workplace.popularContent.video') }}
+          <a-radio value="latest">
+            {{ $t('workplace.popularContent.latest') }}
           </a-radio>
         </a-radio-group>
         <a-table
           :data="renderList"
           :pagination="false"
-          :bordered="false"
+          :columns="columns"
           :scroll="{ x: '100%', y: '264px' }"
         >
-          <template #columns>
-            <a-table-column title="排名" data-index="key"></a-table-column>
-            <a-table-column title="内容标题" data-index="title">
-              <template #cell="{ record }">
-                <a-typography-paragraph
-                  :ellipsis="{
-                    rows: 1,
-                  }"
-                >
-                  {{ record.title }}
-                </a-typography-paragraph>
-              </template>
-            </a-table-column>
-            <a-table-column title="点击量" data-index="clickNumber">
-            </a-table-column>
-            <a-table-column
-              title="日涨幅"
-              data-index="increases"
-              :sortable="{
-                sortDirections: ['ascend', 'descend'],
-              }"
-            >
-              <template #cell="{ record }">
-                <div class="increases-cell">
-                  <span>{{ record.increases }}%</span>
-                  <icon-caret-up
-                    v-if="record.increases !== 0"
-                    style="color: #f53f3f; font-size: 8px"
-                  />
-                </div>
-              </template>
-            </a-table-column>
+          <template #image="{ record }">
+            <a-image :src="record.image" width="100" />
+          </template>
+          <template #labels="{ record }">
+            <a-space wrap>
+              <a-tag>{{ record.type }}</a-tag>
+              <a-tag>{{ record.region }}</a-tag>
+              <a-tag>{{ record.style }}</a-tag>
+            </a-space>
+          </template>
+          <template #action="{ record }">
+            <a-button @click="openTryOn(record)"
+              >{{ $t('workplace.item.tryon') }}
+            </a-button>
           </template>
         </a-table>
       </a-space>
     </a-card>
   </a-spin>
+  <a-modal
+    v-model:visible="showModal"
+    :title="$t('workplace.figures.choose')"
+    width="auto"
+    :ok-loading="loading"
+    :on-before-ok="handleTryOn"
+    unmount-on-close
+    @cancel="showModal = false"
+  >
+    <a-spin :loading="loading">
+      <a-space>
+        <a-radio-group
+          v-model="tryonForm.img"
+          direction="horizontal"
+          size="large"
+        >
+          <a-radio
+            v-for="(figure, index) of figures"
+            :key="index"
+            :value="figure"
+          >
+            <img
+              :src="figure"
+              alt="figure"
+              style="
+                padding: 10px;
+                border: 1px solid #ced6e0;
+                border-radius: 25px;
+              "
+            />
+          </a-radio>
+        </a-radio-group>
+      </a-space>
+    </a-spin>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { computed, h, reactive, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { getLatest, getPopular } from '@/api/recommend';
+  import { usePagination } from 'vue-request';
+  import { useUserStore } from '@/store';
+  import useModal from '@/hooks/modal';
+  import { TryOnRequest } from '@/api/model/tryon';
+  import { Modal } from '@arco-design/web-vue';
   import useLoading from '@/hooks/loading';
-  import { PopularRecord } from '@/api/dashboard';
+  import { tryOnClothes } from '@/api/clothes';
+  import { ClothesReply } from '@/api/model/clothes';
 
-  const type = ref('text');
+  const { t } = useI18n();
+  const userStore = useUserStore();
+  const { showModal } = useModal();
   const { loading, setLoading } = useLoading();
-  const renderList = ref<PopularRecord[]>();
-  const fetchData = async (contentType: string) => {
+  const figures = computed(() => userStore.figures || []);
+  const type = ref('popular');
+  const {
+    current,
+    pageSize,
+    data: popularData,
+    loading: popularLoading,
+    run: refreshPopular,
+  } = usePagination(getPopular);
+  const {
+    data: latestData,
+    loading: latestLoading,
+    run: refreshLatest,
+  } = usePagination(getLatest);
+  const tryonForm = reactive<TryOnRequest>({
+    img: '',
+    clothes: '',
+    clothesId: '',
+  });
+  const renderList = computed(() => {
+    if (type.value === 'popular') {
+      return popularData.value?.metadata.list || [];
+    }
+    return latestData.value?.metadata.list || [];
+  });
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      width: 80,
+    },
+    {
+      title: t('workplace.item.image'),
+      dataIndex: 'image',
+      slotName: 'image',
+    },
+    {
+      title: t('workplace.item.labels'),
+      slotName: 'labels',
+      width: 180,
+    },
+    {
+      title: t('system.table.actions'),
+      slotName: 'action',
+    },
+  ];
+  const refreshData = () => {
+    if (type.value === 'popular') {
+      refreshPopular({
+        current: current.value,
+        pageSize: pageSize.value,
+      });
+    } else {
+      refreshLatest({
+        current: current.value,
+        pageSize: pageSize.value,
+      });
+    }
+  };
+  const openTryOn = (clothes: ClothesReply) => {
+    tryonForm.clothesId = clothes.id;
+    tryonForm.clothes = clothes.image;
+    showModal.value = true;
+  };
+  const handleTryOn = async (done: any) => {
+    setLoading(true);
     try {
       setLoading(true);
-      // const { data } = await queryPopularList({ type: contentType });
-      // renderList.value = data;
-    } catch (err) {
-      // you can report use errorHandler or other
+      const { metadata } = await tryOnClothes(tryonForm);
+      Modal.open({
+        title: t('workplace.tryon.success'),
+        content: () => {
+          return h('img', {
+            src: metadata.result,
+          });
+        },
+        width: 'auto',
+        onOk: () => {
+          done();
+        },
+      });
+    } catch (e) {
+      done(false);
     } finally {
       setLoading(false);
     }
   };
-  const typeChange = (contentType: string) => {
-    fetchData(contentType);
-  };
-  fetchData('text');
 </script>
 
 <style scoped lang="less">

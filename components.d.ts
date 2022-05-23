@@ -7,7 +7,6 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AAffix: typeof import('@arco-design/web-vue')['Affix'];
     AAvatar: typeof import('@arco-design/web-vue')['Avatar'];
-    AAvatarGroup: typeof import('@arco-design/web-vue')['AvatarGroup'];
     ABadge: typeof import('@arco-design/web-vue')['Badge'];
     ABreadcrumb: typeof import('@arco-design/web-vue')['Breadcrumb'];
     ABreadcrumbItem: typeof import('@arco-design/web-vue')['BreadcrumbItem'];
@@ -32,6 +31,7 @@ declare module '@vue/runtime-core' {
     AFormItem: typeof import('@arco-design/web-vue')['FormItem'];
     AGrid: typeof import('@arco-design/web-vue')['Grid'];
     AGridItem: typeof import('@arco-design/web-vue')['GridItem'];
+    AImage: typeof import('@arco-design/web-vue')['Image'];
     AInput: typeof import('@arco-design/web-vue')['Input'];
     AInputNumber: typeof import('@arco-design/web-vue')['InputNumber'];
     AInputPassword: typeof import('@arco-design/web-vue')['InputPassword'];

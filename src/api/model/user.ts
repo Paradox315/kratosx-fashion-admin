@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -136,7 +137,8 @@ export interface UserRequest {
 
   /** @format int64 */
   age?: number;
-  status?: boolean;
+  status?: number;
+  figures?: string[];
   roles?: string[];
 }
 
@@ -168,4 +170,5 @@ export interface UserState {
   registerDate?: string;
   roles: (string | number)[];
   currentRole?: string | number;
+  figures?: string[];
 }

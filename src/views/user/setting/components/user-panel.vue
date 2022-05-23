@@ -133,8 +133,6 @@
       onProgress(parseInt(String(percent), 10), event);
     };
     try {
-      // https://github.com/axios/axios/issues/1630
-      // https://github.com/nuysoft/Mock/issues/127
       const res = await uploadFile(formData, onUploadProgress);
       await userStore.update({ avatar: res.metadata.url });
       onSuccess(res);

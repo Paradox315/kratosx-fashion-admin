@@ -6,7 +6,7 @@
       <div class="content-left">
         <a-grid :cols="24" :col-gap="16" :row-gap="16">
           <a-grid-item :span="24">
-            <MyProject />
+            <MyFigure />
           </a-grid-item>
           <a-grid-item :span="24">
             <LatestActivity />
@@ -30,7 +30,7 @@
 <script lang="ts" setup>
   import UserInfoHeader from './components/user-info-header.vue';
   import LatestNotification from './components/latest-notification.vue';
-  import MyProject from './components/my-project.vue';
+  import MyFigure from './components/my-figures.vue';
   import LatestActivity from './components/latest-activity.vue';
   import Myteam from './components/my-team.vue';
 </script>
@@ -55,7 +55,6 @@
       margin-right: 16px;
       overflow: hidden;
       // background-color: var(--color-bg-2);
-
       :deep(.arco-tabs-nav-tab) {
         margin-left: 16px;
       }
@@ -75,10 +74,12 @@
   .mobile {
     .content {
       display: block;
+
       &-left {
         margin-right: 0;
         margin-bottom: 16px;
       }
+
       &-right {
         width: 100%;
       }

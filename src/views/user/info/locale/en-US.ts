@@ -28,6 +28,7 @@ export default {
   'userInfo.loginLog.label.device.Unknown': 'Unknown',
   'userInfo.title.myFigure': 'My Figure',
   'userInfo.showMore': 'Show More',
+  'userInfo.addFigure': 'Add Figure',
   'userInfo.nodata': 'No Data',
   'userInfo.visits.unit': 'times',
   'userInfo.visits.lastMonth': 'Last Month',

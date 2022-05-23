@@ -85,21 +85,21 @@
           data: [
             {
               value: [148564],
-              name: '纯文本',
+              name: '物品',
               itemStyle: {
                 color: isDark ? '#3D72F6' : '#249EFF',
               },
             },
             {
               value: [334271],
-              name: '图文类',
+              name: '用户',
               itemStyle: {
                 color: isDark ? '#A079DC' : '#313CA9',
               },
             },
             {
               value: [445694],
-              name: '视频类',
+              name: '反馈',
               itemStyle: {
                 color: isDark ? '#6CAAF5' : '#21CCFF',
               },

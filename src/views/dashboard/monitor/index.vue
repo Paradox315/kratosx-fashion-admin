@@ -1,34 +1,25 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['menu.dashboard', 'menu.dashboard.monitor']" />
-    <div class="layout">
-      <div class="layout-left-side">
-        <ChatPanel />
-      </div>
-      <div class="layout-content">
-        <a-space :size="16" direction="vertical" fill>
-          <Studio />
-          <DataStatistic />
-        </a-space>
-      </div>
-      <div class="layout-right-side">
-        <a-space :size="16" direction="vertical" fill>
-          <StudioStatus />
-          <QuickOperation />
-          <StudioInformation />
-        </a-space>
-      </div>
-    </div>
+    <a-card class="general-card">
+      <iframe
+        id="monitor"
+        :src="monitor"
+        scrolling="no"
+        style="
+          width: 100%;
+          height: 100vh;
+          margin-top: 10vh;
+          transform: scale(1.2);
+        "
+        frameborder="0"
+      />
+    </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import ChatPanel from './components/chat-panel.vue';
-  import Studio from './components/studio.vue';
-  import DataStatistic from './components/data-statistic.vue';
-  import StudioStatus from './components/studio-status.vue';
-  import QuickOperation from './components/quick-operation.vue';
-  import StudioInformation from './components/studio-information.vue';
+  const monitor = `${import.meta.env.VITE_API_BASE_URL}/monitor`;
 </script>
 
 <script lang="ts">
@@ -65,6 +56,7 @@
   @media (max-width: @screen-lg) {
     .layout {
       flex-wrap: wrap;
+
       &-left-side {
         flex: 1;
         flex-basis: 100%;
@@ -74,9 +66,9 @@
       &-content {
         flex: none;
         flex-basis: 100%;
-        padding: 0;
         order: -1;
         margin-bottom: 16px;
+        padding: 0;
       }
 
       &-right-side {

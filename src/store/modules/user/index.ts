@@ -34,6 +34,7 @@ const useUserStore = defineStore('user', {
     registerDate: undefined,
     roles: [],
     currentRole: undefined,
+    figures: [],
   }),
 
   getters: {

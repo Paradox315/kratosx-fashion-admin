@@ -10,7 +10,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          Arco Pro
+          Kratosx Fashion
         </a-typography-title>
         <icon-menu-fold
           v-if="appStore.device === 'mobile'"
@@ -54,6 +54,20 @@
             </a-doption>
           </template>
         </a-dropdown>
+      </li>
+      <li>
+        <a-tooltip :content="$t('settings.navbar.fullScreen')">
+          <a-button
+            class="nav-btn"
+            type="outline"
+            :shape="'circle'"
+            @click="toggleScreen"
+          >
+            <template #icon>
+              <icon-fullscreen />
+            </template>
+          </a-button>
+        </a-tooltip>
       </li>
       <li>
         <a-tooltip
@@ -166,15 +180,22 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, inject } from 'vue';
+  import { computed, ref, inject, onMounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
-  import { useCycleList, useDark, useToggle } from '@vueuse/core';
+  import {
+    useCycleList,
+    useDark,
+    useFullscreen,
+    useToggle,
+  } from '@vueuse/core';
   import { useAppStore, usePermissionStore, useUserStore } from '@/store';
   import { LOCALE_OPTIONS } from '@/locale';
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
+  import axios from 'axios';
   import MessageBox from '../message-box/index.vue';
 
+  const { toggle: toggleScreen } = useFullscreen();
   const appStore = useAppStore();
   const userStore = useUserStore();
   const { resetRoutes } = usePermissionStore();
@@ -184,9 +205,6 @@
   const { next, state } = useCycleList(computed(() => userStore.roles).value);
   const avatar = computed(() => {
     return userStore.avatar;
-  });
-  const roles = computed(() => {
-    return userStore.roles;
   });
   const theme = computed(() => {
     return appStore.theme;
@@ -234,6 +252,9 @@
     Message.success(`当前角色ID： ${state.value}`);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu');
+  onMounted(() => {
+    axios.get('/');
+  });
 </script>
 
 <style scoped lang="less">
