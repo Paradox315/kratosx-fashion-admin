@@ -253,7 +253,7 @@
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu');
   onMounted(() => {
-    axios.get('/');
+    axios.get('/csrf');
   });
 </script>
 
