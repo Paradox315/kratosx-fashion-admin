@@ -25,20 +25,24 @@ const { t } = i18n.global;
 
 let refreshStatus = false;
 let logoutStatus = false;
+let resetStatus = false;
 // resetSession
 const resetSession = () => {
-  Modal.error({
-    title: '鉴权失败',
-    content: '你的token已经过期，请重新登录，如果问题依然存在，请联系管理员',
-    okText: '重新登录',
-    async onOk() {
-      clearRefreshToken();
-      clearAccessToken();
-      return router.push({
-        name: 'login',
-      });
-    },
-  });
+  if (!resetStatus) {
+    resetStatus = true;
+    Modal.error({
+      title: '鉴权失败',
+      content: '你的token已经过期，请重新登录，如果问题依然存在，请联系管理员',
+      okText: '重新登录',
+      async onOk() {
+        clearRefreshToken();
+        clearAccessToken();
+        return router.push({
+          name: 'login',
+        });
+      },
+    });
+  }
 };
 
 // showError 展示错误
@@ -66,6 +70,7 @@ const errorHandler = async (
           !refreshStatus &&
           res?.message !== 'invalid user'
         ) {
+          refreshStatus = true;
           Message.info('自动续期中，请稍候...');
           try {
             const { metadata } = await refreshToken({
@@ -77,8 +82,6 @@ const errorHandler = async (
             window.location.reload();
           } catch (e) {
             resetSession();
-          } finally {
-            refreshStatus = true;
           }
         } else {
           resetSession();

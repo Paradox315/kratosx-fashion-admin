@@ -10,7 +10,7 @@ export default mergeConfig(
   {
     mode: 'production',
     plugins: [
-      configCompressPlugin('gzip'),
+      configCompressPlugin('brotli'),
       configVisualizerPlugin(),
       configArcoResolverPlugin(),
       configStyleImportPlugin(),
