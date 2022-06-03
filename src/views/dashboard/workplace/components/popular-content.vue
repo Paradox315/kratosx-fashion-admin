@@ -22,9 +22,16 @@
         </a-radio-group>
         <a-table
           :data="renderList"
-          :pagination="false"
+          :pagination="{
+            pageSize: pageSize,
+            current: type === 'popular' ? currentPopular : currentLatest,
+            simple: true,
+            total: 100,
+          }"
+          page-position="tr"
           :columns="columns"
           :scroll="{ x: '100%', y: '264px' }"
+          @page-change="changePage"
         >
           <template #image="{ record }">
             <a-image :src="record.image" width="100" />
@@ -102,13 +109,16 @@
   const figures = computed(() => userStore.figures || []);
   const type = ref('popular');
   const {
-    current,
+    current: currentPopular,
     pageSize,
+    changeCurrent: changePopularCurrent,
     data: popularData,
     loading: popularLoading,
     run: refreshPopular,
   } = usePagination(getPopular);
   const {
+    current: currentLatest,
+    changeCurrent: changeLatestCurrent,
     data: latestData,
     loading: latestLoading,
     run: refreshLatest,
@@ -145,15 +155,22 @@
       slotName: 'action',
     },
   ];
+  const changePage = (page: number) => {
+    if (type.value === 'popular') {
+      changePopularCurrent(page);
+    } else {
+      changeLatestCurrent(page);
+    }
+  };
   const refreshData = () => {
     if (type.value === 'popular') {
       refreshPopular({
-        current: current.value,
+        current: currentPopular.value,
         pageSize: pageSize.value,
       });
     } else {
       refreshLatest({
-        current: current.value,
+        current: currentLatest.value,
         pageSize: pageSize.value,
       });
     }

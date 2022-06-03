@@ -70,6 +70,8 @@
     pagination: {
       totalKey: 'metadata.total',
     },
+    cacheKey: 'permission',
+    cacheTime: 300000, // 5 minutes
   });
   const routers = computed(() => data.value?.metadata?.list || []);
   const columns = [

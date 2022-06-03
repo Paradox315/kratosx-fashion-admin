@@ -1,0 +1,143 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/system/v1/monitor.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Monitor"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/disk": {
+      "get": {
+        "summary": "@Cache",
+        "operationId": "Monitor_GetDiskInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DiskReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Monitor"
+        ]
+      }
+    },
+    "/runtime": {
+      "get": {
+        "summary": "@Cache",
+        "operationId": "Monitor_GetRuntimeInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RuntimeReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Monitor"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1DiskReply": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "free": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "used": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "usedPercent": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "v1RuntimeReply": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        },
+        "arch": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "compiler": {
+          "type": "string"
+        },
+        "cpus": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}

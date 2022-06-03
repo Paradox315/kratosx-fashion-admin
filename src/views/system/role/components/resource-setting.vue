@@ -90,8 +90,13 @@
   const checkedObj = useVModel(props, 'checkedObj', emit);
   const roleId = useVModel(props, 'roleId', emit);
   const { loading, setLoading } = useLoading();
-  const { data: routerData, loading: routerLoading } =
-    useRequest(getRouterTree);
+  const { data: routerData, loading: routerLoading } = useRequest(
+    getRouterTree,
+    {
+      cacheKey: 'router',
+      cacheTime: 300000, // 5 minutes
+    }
+  );
   const { data: menuData, loading: menuLoading } = useRequest(getMenuTree);
   const selectedMenu = ref<string>(''); // 获取资源部分
   const buildMenuTree = (menus?: Menu[]): TreeNodeData[] => {

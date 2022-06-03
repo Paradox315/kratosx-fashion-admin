@@ -1,30 +1,34 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['menu.dashboard', 'menu.dashboard.monitor']" />
-    <a-card class="general-card">
-      <iframe
-        id="monitor"
-        :src="monitor"
-        scrolling="no"
-        style="
-          width: 100%;
-          height: 100vh;
-          margin-top: 10vh;
-          transform: scale(1.2);
-        "
-        frameborder="0"
-      />
-    </a-card>
+    <a-row justify="space-between" :gutter="16">
+      <a-col :xs="24" :sm="18" :md="18" :lg="18" :xl="18" :xxl="18">
+        <MonitorContent />
+      </a-col>
+      <a-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6" :xxl="6">
+        <Runtime />
+        <Disk style="margin-top: 30px" />
+      </a-col>
+    </a-row>
   </div>
 </template>
 
-<script lang="ts" setup>
-  const monitor = `${import.meta.env.VITE_API_BASE_URL}/monitor`;
-</script>
+<script lang="ts" setup></script>
 
 <script lang="ts">
+  import { createAsyncComponent } from '@/utils/factory';
+  import Disk from '@/views/dashboard/monitor/components/disk.vue';
+
+  const MonitorContent = createAsyncComponent(
+    () => import('@/views/dashboard/monitor/components/monitor-content.vue')
+  );
+  const Runtime = createAsyncComponent(
+    () => import('@/views/dashboard/monitor/components/runtime.vue')
+  );
+
   export default {
     name: 'Monitor',
+    components: { Disk, Runtime, MonitorContent },
   };
 </script>
 

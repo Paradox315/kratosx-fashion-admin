@@ -180,7 +180,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, inject, onMounted } from 'vue';
+  import { computed, ref, inject } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import {
     useCycleList,
@@ -192,7 +192,6 @@
   import { LOCALE_OPTIONS } from '@/locale';
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
-  import axios from 'axios';
   import MessageBox from '../message-box/index.vue';
 
   const { toggle: toggleScreen } = useFullscreen();
@@ -252,9 +251,6 @@
     Message.success(`当前角色ID： ${state.value}`);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu');
-  onMounted(() => {
-    axios.get('/csrf');
-  });
 </script>
 
 <style scoped lang="less">
