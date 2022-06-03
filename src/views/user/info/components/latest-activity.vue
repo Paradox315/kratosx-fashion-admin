@@ -137,7 +137,9 @@
       },
       {
         label: t('userInfo.loginLog.label.position'),
-        value: `${log.position?.lat || 0}°,${log.position?.lng || 0}°`,
+        value: `${log.position?.lat.toFixed(2) || 0}°,${
+          log.position?.lng.toFixed(2) || 0
+        }°`,
       },
       {
         label: t('userInfo.loginLog.label.os'),

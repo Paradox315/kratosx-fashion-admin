@@ -54,10 +54,10 @@ export interface PasswordRequest {
 
 export interface Position {
   /** @format float */
-  lat?: number;
+  lat: number;
 
   /** @format float */
-  lng?: number;
+  lng: number;
 }
 
 export interface QueryOption {
