@@ -1,9 +1,10 @@
 <template>
-  <a-card class="general-card" :title="$t('monitor.disk')">
+  <a-card class="general-card" :title="$t('monitor.disk')" :loading="loading">
     <a-progress
       type="circle"
       size="large"
       animation
+      :stroke-width="10"
       :percent="usage"
       :style="{
         width: '100%',
@@ -52,7 +53,7 @@
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${(bytes / k ** i).toPrecision(3)} ${sizes[i]}`;
   };
-  useRequest<HttpResponse<DiskReply>>(getDiskInfo, {
+  const { loading } = useRequest<HttpResponse<DiskReply>>(getDiskInfo, {
     onSuccess: (resp: HttpResponse<DiskReply>) => {
       const { metadata } = resp;
       diskInfo.value[0].value = formatBytes(
@@ -64,8 +65,9 @@
       diskInfo.value[2].value = formatBytes(
         parseInt(metadata.used as string, 10)
       );
-      usage.value =
-        parseFloat(metadata.usedPercent?.toFixed(2) as string) / 100;
+      usage.value = parseFloat(
+        ((metadata.usedPercent as number) / 100)?.toFixed(2)
+      );
     },
   });
 </script>

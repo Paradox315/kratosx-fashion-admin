@@ -1,5 +1,9 @@
 <template>
-  <a-card class="general-card" :title="$t('monitor.runtime')">
+  <a-card
+    class="general-card"
+    :title="$t('monitor.runtime')"
+    :loading="loading"
+  >
     <template #cover>
       <div
         :style="{
@@ -69,7 +73,7 @@
       value: '0',
     },
   ]);
-  useRequest<HttpResponse<RuntimeReply>>(getRuntimeInfo, {
+  const { loading } = useRequest<HttpResponse<RuntimeReply>>(getRuntimeInfo, {
     onSuccess: (data: HttpResponse<RuntimeReply>) => {
       const { metadata } = data;
       runtimeInfo.value[0].value = metadata.host || 'Unknown';

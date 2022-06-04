@@ -17,7 +17,6 @@
 
 <script lang="ts">
   import { createAsyncComponent } from '@/utils/factory';
-  import Disk from '@/views/dashboard/monitor/components/disk.vue';
 
   const MonitorContent = createAsyncComponent(
     () => import('@/views/dashboard/monitor/components/monitor-content.vue')
@@ -26,6 +25,9 @@
     () => import('@/views/dashboard/monitor/components/runtime.vue')
   );
 
+  const Disk = createAsyncComponent(
+    () => import('@/views/dashboard/monitor/components/disk.vue')
+  );
   export default {
     name: 'Monitor',
     components: { Disk, Runtime, MonitorContent },

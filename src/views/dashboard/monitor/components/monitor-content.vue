@@ -506,30 +506,7 @@
         className: 'echarts-tooltip-diy',
       },
       graphic: {
-        elements: [
-          {
-            type: 'text',
-            left: '2.6%',
-            bottom: '18',
-            style: {
-              text: '12.10',
-              textAlign: 'center',
-              fill: '#4E5969',
-              fontSize: 12,
-            },
-          },
-          {
-            type: 'text',
-            right: '0',
-            bottom: '18',
-            style: {
-              text: '12.17',
-              textAlign: 'center',
-              fill: '#4E5969',
-              fontSize: 12,
-            },
-          },
-        ],
+        elements: graphicElements.value,
       },
       series: [
         generateSeries(
