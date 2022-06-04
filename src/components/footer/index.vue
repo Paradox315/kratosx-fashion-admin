@@ -2,7 +2,6 @@
   <a-layout-footer class="footer">
     <a-space>
       <a-link href="https://arco.design/" style="display: flex; padding: 5px">
-        <a-icon type="logo-arco" />
         <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
           <circle cx="10" cy="10" r="10" fill="#4dabf7" />
           <path
