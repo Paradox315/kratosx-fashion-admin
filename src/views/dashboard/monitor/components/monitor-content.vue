@@ -191,7 +191,7 @@
   const { chartOption: latencyChart } = useChartOption(() => {
     return {
       grid: {
-        left: '3.6%',
+        left: '6.6%',
         right: '0',
         top: '10',
         bottom: '30',
@@ -317,7 +317,7 @@
   const { chartOption: ramChart } = useChartOption(() => {
     return {
       grid: {
-        left: '3.6%',
+        left: '6.6%',
         right: '0',
         top: '10',
         bottom: '30',
